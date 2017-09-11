@@ -145,6 +145,11 @@ void Cursor::add(Element* s)
             s->setParent(m);
             _score->undoAddElement(s);
             }
+      else if (s->type() == Element::Type::LYRICS) {
+            if (element()->isChordRest()) {
+                  element()->add(s);
+                  }
+            }
       else {
             _score->undoAddElement(s);
             }

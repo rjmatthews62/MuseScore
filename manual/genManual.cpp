@@ -181,6 +181,7 @@ static void parseClass(const QString& name, const QString& in)
                         }
                   }
             }
+      if (cl.parent == "Text") cl.parent = "MText";
       classes.append(cl);
       }
 
