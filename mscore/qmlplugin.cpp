@@ -101,7 +101,7 @@ void QmlPlugin::closeScore(Ms::Score* score)
 //   newElement
 //---------------------------------------------------------
 
-Ms::Element* QmlPlugin::newElement(int t)
+Ms::ElementW* QmlPlugin::newElement(int t)
       {
       Score* score = curScore();
       if (score == 0)
@@ -109,7 +109,7 @@ Ms::Element* QmlPlugin::newElement(int t)
       Element* e = Element::create(ElementType(t), score);
       // tell QML not to garbage collect this score
 //TODO      Ms::MScore::qml()->setObjectOwnership(e, QQmlEngine::CppOwnership);
-      return e;
+      return (e ? new ElementW(e) : 0);
       }
 
 //---------------------------------------------------------

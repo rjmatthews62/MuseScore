@@ -34,14 +34,23 @@
 namespace Ms {
 
 //---------------------------------------------------------
+// Element for managing Lyrics. Each Lyrics element is linked to a Chord or ChordRest,
+// and is displayed and moved accordingly. There can be multiple lyric lines per chord,
+// controlled by the <b>no</b> property.
+//
 //   @@ Lyrics
+//   @P text string Words/syllables
 //   @P syllabic  enum (Lyrics.SINGLE, Lyrics.BEGIN, Lyrics.END, Lyrics.MIDDLE)
+//   @P no  int  Lyric line no.
 //---------------------------------------------------------
 
 class LyricsLine;
 
 class Lyrics : public Text {
       Q_GADGET
+      Q_PROPERTY(Ms::Lyrics::Syllabic syllabic READ syllabic WRITE setSyllabic)
+      Q_PROPERTY(int no READ no WRITE setNo)
+      Q_ENUMS(Syllabic)
 
    public:
       enum class Syllabic : char { SINGLE, BEGIN, END, MIDDLE };
