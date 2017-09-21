@@ -434,6 +434,7 @@ QQmlEngine* MScore::qml()
             qmlRegisterType<Cursor>     ("MuseScore", 3, 0, "Cursor");
             qmlRegisterType<ElementW>   ("MuseScore", 3, 0, "Element");
             qRegisterMetaType<ElementW*>("ElementWrapper*");
+            qmlRegisterType<Lyrics>     ("MuseScore", 3, 0, "Lyrics");
 #if 0
             qmlRegisterType<Segment>    ("MuseScore", 1, 0, "Segment");
             qmlRegisterType<Chord>      ("MuseScore", 1, 0, "Chord");
@@ -453,7 +454,6 @@ QQmlEngine* MScore::qml()
             qmlRegisterType<NoteDot>    ("MuseScore", 1, 0, "NoteDot");
             qmlRegisterType<FiguredBass>("MuseScore", 1, 0, "FiguredBass");
             qmlRegisterType<Text>       ("MuseScore", 1, 0, "MText");
-            qmlRegisterType<Lyrics>     ("MuseScore", 1, 0, "Lyrics");
             qmlRegisterType<FiguredBassItem>("MuseScore", 1, 0, "FiguredBassItem");
             qmlRegisterType<LayoutBreak>("MuseScore", 1, 0, "LayoutBreak");
             qmlRegisterType<Hook>       ("MuseScore", 1, 0, "Hook");

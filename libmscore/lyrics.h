@@ -49,7 +49,7 @@ class LyricsLine;
 class Lyrics : public Text {
       Q_GADGET
       Q_PROPERTY(Ms::Lyrics::Syllabic syllabic READ syllabic WRITE setSyllabic)
-      Q_PROPERTY(int no READ no WRITE setNo)
+      Q_PROPERTY(int no READ no)
       Q_ENUMS(Syllabic)
 
    public:
