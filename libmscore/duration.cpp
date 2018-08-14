@@ -24,8 +24,8 @@ namespace Ms {
 //   DurationElement
 //---------------------------------------------------------
 
-DurationElement::DurationElement(Score* s)
-   : Element(s)
+DurationElement::DurationElement(Score* s, ElementFlags f)
+   : Element(s, f)
       {
       _tuplet = 0;
       }
@@ -94,6 +94,27 @@ Fraction DurationElement::actualFraction() const
       }
 
 //---------------------------------------------------------
+//   ftick
+//    fractional tick
+//---------------------------------------------------------
+
+Fraction DurationElement::ftick() const
+      {
+      Tuplet* t = tuplet();
+      if (t) {
+            Fraction f = t->ftick();
+            for (DurationElement* de : t->elements()) {
+                  if (de == this)
+                        break;
+                  f += de->actualFraction();
+                  }
+            return f.reduced();
+            }
+      else
+            return Fraction::fromTicks(tick());
+      }
+
+//---------------------------------------------------------
 //   readProperties
 //---------------------------------------------------------
 
@@ -117,7 +138,7 @@ bool DurationElement::readProperties(XmlReader& e)
                   }
             return true;
             }
-      if (Element::readProperties(e))
+      else if (Element::readProperties(e))
             return true;
       return false;
       }
@@ -150,10 +171,10 @@ void DurationElement::writeTuplet(XmlWriter& xml)
 //   getProperty
 //---------------------------------------------------------
 
-QVariant DurationElement::getProperty(P_ID propertyId) const
+QVariant DurationElement::getProperty(Pid propertyId) const
       {
       switch (propertyId) {
-            case P_ID::DURATION:
+            case Pid::DURATION:
                   return QVariant::fromValue(_duration);
             default:
                   return Element::getProperty(propertyId);
@@ -164,10 +185,10 @@ QVariant DurationElement::getProperty(P_ID propertyId) const
 //   setProperty
 //---------------------------------------------------------
 
-bool DurationElement::setProperty(P_ID propertyId, const QVariant& v)
+bool DurationElement::setProperty(Pid propertyId, const QVariant& v)
       {
       switch (propertyId) {
-            case P_ID::DURATION: {
+            case Pid::DURATION: {
                   Fraction f(v.value<Fraction>());
                   setDuration(f);
                   score()->setLayoutAll();

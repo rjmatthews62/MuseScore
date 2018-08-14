@@ -57,20 +57,20 @@
           <sigD>4</sigD>
           </TimeSig>
         <StaffText>
-          <pos x="25" y="-13"/>
+          <pos x="25" y="-17"/>
           <family>Arial</family>
           <size>24</size>
           <bold>1</bold>
           <align>center,baseline</align>
-          <offset x="0" y="2"/>
+          <layoutOffset x="0" y="2"/>
           <text>Volta 1</text>
           </StaffText>
         <StaffText>
-          <pos x="25" y="-8"/>
+          <pos x="25" y="-12"/>
           <family>Arial</family>
           <bold>1</bold>
           <align>center,baseline</align>
-          <offset x="0" y="2"/>
+          <layoutOffset x="0" y="2"/>
           <text>MuseScore testfile</text>
           </StaffText>
         <Chord>
@@ -115,11 +115,11 @@
           <subtype>line</subtype>
           </LayoutBreak>
         <StaffText>
-          <pos x="5" y="-4"/>
+          <pos x="5" y="-8"/>
           <family>Arial</family>
           <bold>1</bold>
           <align>center,baseline</align>
-          <offset x="0" y="2"/>
+          <layoutOffset x="0" y="2"/>
           <text>Leon Vinken</text>
           </StaffText>
         <endSpanner id="3"/>

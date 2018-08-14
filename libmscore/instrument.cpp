@@ -262,7 +262,7 @@ void Instrument::read(XmlReader& e, Part* part)
                   e.unknown();
             }
       if (_useDrumset) {
-            if (_channel[0]->bank == 0)
+            if (_channel[0]->bank == 0 && _channel[0]->synti.toLower() != "zerberus")
                   _channel[0]->bank = 128;
             _channel[0]->updateInitList();
             }
@@ -323,7 +323,7 @@ bool Instrument::readProperties(XmlReader& e, Part* part, bool* customDrumset)
             // be created
             if (!_drumset)
                   _drumset = new Drumset(*smDrumset);
-            if (!customDrumset) {
+            if (!(*customDrumset)) {
                   const_cast<Drumset*>(_drumset)->clear();
                   *customDrumset = true;
                   }
@@ -554,6 +554,8 @@ void Channel::read(XmlReader& e, Part* part)
             else
                   e.unknown();
             }
+      if (128 == bank && "zerberus" == synti.toLower())
+            bank = 0;
       updateInitList();
       }
 

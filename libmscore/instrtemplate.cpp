@@ -53,6 +53,19 @@ static InstrumentGroup* searchInstrumentGroup(const QString& name)
       }
 
 //---------------------------------------------------------
+//   searchArticulation
+//---------------------------------------------------------
+
+static MidiArticulation searchArticulation(const QString& name)
+      {
+      foreach(MidiArticulation a, articulation) {
+            if (a.name == name)
+                  return a;
+            }
+      return MidiArticulation();
+      }
+
+//---------------------------------------------------------
 //   readStaffIdx
 //---------------------------------------------------------
 
@@ -67,7 +80,7 @@ static int readStaffIdx(XmlReader& e)
       }
 
 //---------------------------------------------------------
-//   readInstrumentGroup
+//   read InstrumentGroup
 //---------------------------------------------------------
 
 void InstrumentGroup::read(XmlReader& e)
@@ -106,6 +119,16 @@ void InstrumentGroup::read(XmlReader& e)
             }
       if (id.isEmpty())
             id = name.toLower().replace(" ", "-");
+      }
+
+//---------------------------------------------------------
+//   clear InstrumentGroup
+//---------------------------------------------------------
+
+void InstrumentGroup::clear()
+      {
+      qDeleteAll(instrumentTemplates);
+      instrumentTemplates.clear();
       }
 
 //---------------------------------------------------------
@@ -486,7 +509,7 @@ void InstrumentTemplate::read(XmlReader& e)
             channel.append(a);
             }
       if (useDrumset) {
-            if (channel[0].bank == 0)
+            if (channel[0].bank == 0 && channel[0].synti.toLower() != "zerberus")
                   channel[0].bank = 128;
             channel[0].updateInitList();
             }
@@ -587,6 +610,21 @@ bool saveInstrumentTemplates1(const QString& instrTemplates)
       }
 
 //---------------------------------------------------------
+//   clearInstrumentTemplates
+//---------------------------------------------------------
+
+void clearInstrumentTemplates()
+      {
+      for (InstrumentGroup* g : instrumentGroups)
+            g->clear();
+      qDeleteAll(instrumentGroups);
+      instrumentGroups.clear();
+      qDeleteAll(instrumentGenres);
+      instrumentGenres.clear();
+      articulation.clear();
+      }
+
+//---------------------------------------------------------
 //   loadInstrumentTemplates
 //---------------------------------------------------------
 
@@ -598,14 +636,14 @@ bool loadInstrumentTemplates(const QString& instrTemplates)
             return false;
             }
 
-      XmlReader e(0, &qf);
+      XmlReader e(&qf);
       while (e.readNextStartElement()) {
             if (e.name() == "museScore") {
                   while (e.readNextStartElement()) {
                         const QStringRef& tag(e.name());
                         if (tag == "instrument-group" || tag == "InstrumentGroup") {
-                              QString id(e.attribute("id"));
-                              InstrumentGroup* group = searchInstrumentGroup(id);
+                              QString idGroup(e.attribute("id"));
+                              InstrumentGroup* group = searchInstrumentGroup(idGroup);
                               if (group == 0) {
                                     group = new InstrumentGroup;
                                     instrumentGroups.append(group);
@@ -614,13 +652,14 @@ bool loadInstrumentTemplates(const QString& instrTemplates)
                               }
                         else if (tag == "Articulation") {
                               // read global articulation
-                              MidiArticulation a;
+                              QString name(e.attribute("name"));
+                              MidiArticulation a = searchArticulation(name);
                               a.read(e);
                               articulation.append(a);
                               }
                         else if (tag == "Genre") {
-                              QString id(e.attribute("id"));
-                              InstrumentGenre* genre = searchInstrumentGenre(id);
+                              QString idGenre(e.attribute("id"));
+                              InstrumentGenre* genre = searchInstrumentGenre(idGenre);
                               if (!genre) {
                                     genre = new InstrumentGenre;
                                     instrumentGenres.append(genre);
@@ -642,7 +681,7 @@ bool loadInstrumentTemplates(const QString& instrTemplates)
 
 InstrumentTemplate* searchTemplate(const QString& name)
       {
-      foreach(InstrumentGroup* g, instrumentGroups) {
+      foreach (InstrumentGroup* g, instrumentGroups) {
             foreach(InstrumentTemplate* it, g->instrumentTemplates) {
                   if (it->id == name)
                         return it;
@@ -651,6 +690,20 @@ InstrumentTemplate* searchTemplate(const QString& name)
       return 0;
       }
 
+//---------------------------------------------------------
+//   searchTemplateForMusicXMLid
+//---------------------------------------------------------
+
+InstrumentTemplate* searchTemplateForMusicXmlId(const QString& mxmlId)
+      {
+      foreach(InstrumentGroup* g, instrumentGroups) {
+            foreach(InstrumentTemplate* it, g->instrumentTemplates) {
+                  if (it->musicXMLid == mxmlId)
+                        return it;
+                  }
+            }
+      return 0;
+      }
 
 //---------------------------------------------------------
 //   linkGenre
@@ -717,6 +770,30 @@ ClefTypeList InstrumentTemplate::clefType(int staffIdx) const
       if (staffIdx < staves)
             return clefTypes[staffIdx];
       return clefTypes[0];
+      }
+
+//---------------------------------------------------------
+//   defaultClef
+//    traverse the instrument list for first instrument
+//    with midi patch 'program'. Return the default clef
+//    for this instrument.
+//---------------------------------------------------------
+
+ClefType defaultClef(int program)
+      {
+      if (program >= 25 && program < 32)              // this are guitars
+            return ClefType::G8_VB;
+      else if (program >= 33 && program < 41)         // this is bass
+            return ClefType::F8_VB;
+
+      for (InstrumentGroup* g : instrumentGroups) {
+            for (InstrumentTemplate* it : g->instrumentTemplates) {
+                  if (it->channel[0].bank == 0 && it->channel[0].program == program){
+                        return (it->clefTypes[0]._concertClef);
+                        }
+                  }
+            }
+      return ClefType::G;
       }
 
 }

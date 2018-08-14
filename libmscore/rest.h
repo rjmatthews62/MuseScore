@@ -27,9 +27,6 @@ enum class SymId;
 //---------------------------------------------------------
 
 class Rest : public ChordRest {
-      Q_GADGET
-      Q_PROPERTY(bool  isFullMeasure  READ isFullMeasureRest)
-
       // values calculated by layout:
       SymId _sym;
       int dotline    { -1  };       // depends on rest symbol
@@ -39,7 +36,6 @@ class Rest : public ChordRest {
       virtual QRectF drag(EditData&) override;
       virtual qreal upPos()   const override;
       virtual qreal downPos() const override;
-      virtual qreal centerX() const override;
       virtual void setUserOff(const QPointF& o) override;
 
 
@@ -91,9 +87,9 @@ class Rest : public ChordRest {
       virtual qreal stemPosX() const;
       virtual QPointF stemPosBeam() const;
 
-      virtual bool setProperty(P_ID propertyId, const QVariant& v) override;
-      virtual QVariant getProperty(P_ID propertyId) const override;
-      virtual QVariant propertyDefault(P_ID) const override;
+      virtual bool setProperty(Pid propertyId, const QVariant& v) override;
+      virtual QVariant getProperty(Pid propertyId) const override;
+      virtual QVariant propertyDefault(Pid) const override;
 
       virtual Element* nextElement() override;
       virtual Element* prevElement() override;

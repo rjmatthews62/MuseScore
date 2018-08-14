@@ -205,7 +205,7 @@ class MeasuresDialog : public QDialog, public Ui::MeasuresDialogBase {
 class MuseScoreApplication : public QtSingleApplication {
    public:
       QStringList paths;
-      MuseScoreApplication(const QString &id, int &argc, char **argv)
+      MuseScoreApplication(const QString& id, int &argc, char **argv)
          : QtSingleApplication(id, argc, argv) {
             };
       virtual bool event(QEvent *ev) override;
@@ -223,6 +223,7 @@ class MuseScore : public QMainWindow, public MuseScoreCore {
       ScoreView* cv                        { 0 };
       ScoreState _sstate;
       UpdateChecker* ucheck;
+      ExtensionsUpdateChecker* packUChecker = nullptr;
 
       static const std::list<const char*> _allNoteInputMenuEntries;
       static const std::list<const char*> _basicNoteInputMenuEntries;
@@ -234,7 +235,7 @@ class MuseScore : public QMainWindow, public MuseScoreCore {
 
       static const std::list<const char*> _allPlaybackControlEntries;
       std::list<const char*> _playbackControlEntries { _allPlaybackControlEntries };
-      
+
       QVBoxLayout* layout;    // main window layout
       QSplitter* splitter;
       ScoreTab* tab1;
@@ -409,6 +410,7 @@ class MuseScore : public QMainWindow, public MuseScoreCore {
 
       qreal _physicalDotsPerInch;
 
+      QMessageBox* infoMsgBox;
       //---------------------
 
       virtual void closeEvent(QCloseEvent*);
@@ -459,6 +461,7 @@ class MuseScore : public QMainWindow, public MuseScoreCore {
 
       void updateViewModeCombo();
       void switchLayoutMode(LayoutMode);
+      void setPlayRepeats(bool repeat);
 
    private slots:
       void cmd(QAction* a, const QString& cmd);
@@ -506,10 +509,11 @@ class MuseScore : public QMainWindow, public MuseScoreCore {
       void showWorkspaceMenu();
       void switchLayer(const QString&);
       void switchPlayMode(int);
-      void networkFinished(QNetworkReply*);
+      void networkFinished();
       void switchLayoutMode(int);
       void showMidiImportPanel();
       void changeWorkspace(QAction*);
+      void onLongOperationFinished();
 
       virtual QMenu* createPopupMenu() override;
 
@@ -525,6 +529,7 @@ class MuseScore : public QMainWindow, public MuseScoreCore {
       void setPlayState()      { changeState(STATE_PLAY); }
       void setNoteEntryState() { changeState(STATE_NOTE_ENTRY); }
       void checkForUpdate();
+      void checkForExtensionsUpdate();
       void midiNoteReceived(int channel, int pitch, int velo);
       void midiNoteReceived(int pitch, bool ctrl, int velo);
       void instrumentChanged();
@@ -583,6 +588,7 @@ class MuseScore : public QMainWindow, public MuseScoreCore {
       PianorollEditor* getPianorollEditor() const { return pianorollEditor; }
       DrumrollEditor* getDrumrollEditor() const   { return drumrollEditor; }
       PianoTools* pianoTools() const              { return _pianoTools; }
+      PluginManager* getPluginManager() const     { return pluginManager; }
       void writeSessionFile(bool);
       bool restoreSession(bool);
       bool splitScreen() const { return _splitScreen; }
@@ -606,6 +612,7 @@ class MuseScore : public QMainWindow, public MuseScoreCore {
       QNetworkAccessManager* networkManager();
       virtual Score* openScore(const QString& fn);
       bool hasToCheckForUpdate();
+      bool hasToCheckForExtensionsUpdate();
       static bool unstable();
       bool eventFilter(QObject *, QEvent *);
       void setMidiRecordId(int id) { _midiRecordId = id; }
@@ -749,7 +756,9 @@ class MuseScore : public QMainWindow, public MuseScoreCore {
       LoginManager* loginManager()     { return _loginManager; }
       QHelpEngine*  helpEngine() const { return _helpEngine;   }
 
-      void updateInspector();
+      virtual void updateInspector() override;
+      void updateInstrumentDialog();
+      void reloadInstrumentTemplates();
       void showSynthControl(bool);
       void showMixer(bool);
 
@@ -767,11 +776,17 @@ class MuseScore : public QMainWindow, public MuseScoreCore {
 
       void setNoteInputMenuEntries(std::list<const char*> l)         { _noteInputMenuEntries = l; }
       void populateNoteInputMenu();
+      static void updateUiStyleAndTheme();
 
       void showError();
 
       static void saveGeometry(QWidget const*const qw);
       static void restoreGeometry(QWidget*const qw);
+
+      void updateWindowTitle(Score* score);
+      bool importExtension(QString path);
+      bool uninstallExtension(QString extensionId);
+      Q_INVOKABLE bool isInstalledExtension(QString extensionId);
       };
 
 extern MuseScore* mscore;

@@ -150,7 +150,13 @@ void StringData::fretChords(Chord * chord) const
       bFretting = true;
 
       // we need to keep track of string allocation
+#if (!defined (_MSCVER) && !defined (_MSC_VER))
       int bUsed[strings()];                    // initially all strings are available
+#else
+      // MSVC does not support VLA. Replace with std::vector. If profiling determines that the
+      //    heap allocation is slow, an optimization might be used.
+      std::vector<int> bUsed(strings());
+#endif
       for(nString=0; nString<strings(); nString++)
             bUsed[nString] = 0;
       // we also need the notes sorted in order of string (from highest to lowest) and then pitch
@@ -173,7 +179,7 @@ void StringData::fretChords(Chord * chord) const
             for(trk = trkFrom; trk < trkTo; ++trk) {
                   Element* ch = seg->elist().at(trk);
                   if (ch && ch->type() == ElementType::CHORD)
-                        sortChordNotes(sortedNotes, static_cast<Chord*>(ch), pitchOffset, &count);
+                        sortChordNotes(sortedNotes, toChord(ch), pitchOffset, &count);
                   }
             }
       // determine used range of frets
@@ -202,9 +208,9 @@ void StringData::fretChords(Chord * chord) const
                         note->setFretConflict(true);
                         // store fretting change without affecting chord context
                         if (nFret != nNewFret)
-                              note->score()->undoChangeProperty(note, P_ID::FRET, nNewFret);
+                              note->undoChangeProperty(Pid::FRET, nNewFret);
                         if (nString != nNewString)
-                              note->score()->undoChangeProperty(note, P_ID::STRING, nNewString);
+                              note->undoChangeProperty(Pid::STRING, nNewString);
                         continue;
                         }
                   // note can be fretted: use string
@@ -232,9 +238,9 @@ void StringData::fretChords(Chord * chord) const
 
             // if fretting did change, store as a fret change
             if (nFret != nNewFret)
-                  note->score()->undoChangeProperty(note, P_ID::FRET, nNewFret);
+                  note->undoChangeProperty(Pid::FRET, nNewFret);
             if (nString != nNewString)
-                  note->score()->undoChangeProperty(note, P_ID::STRING, nNewString);
+                  note->undoChangeProperty(Pid::STRING, nNewString);
             }
 
       // check for any remaining fret conflict
@@ -244,6 +250,22 @@ void StringData::fretChords(Chord * chord) const
 
       bFretting = false;
       }
+
+
+//---------------------------------------------------------
+//   frettedStrings
+//    Returns the number of fretted strings.
+//---------------------------------------------------------
+
+int StringData::frettedStrings() const
+      {
+      int num = 0;
+      for (auto s : stringTable)
+            if (!s.open)
+                  num++;
+      return num;
+      }
+
 
 //********************
 // STATIC METHODS

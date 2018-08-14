@@ -26,8 +26,8 @@ namespace Ms {
 //   Symbol
 //---------------------------------------------------------
 
-Symbol::Symbol(Score* s)
-   : BSymbol(s)
+Symbol::Symbol(Score* s, ElementFlags f)
+   : BSymbol(s, f)
       {
       _sym = SymId::accidentalSharp;        // arbitrary valid default
       }
@@ -49,15 +49,6 @@ QString Symbol::symName() const
       }
 
 //---------------------------------------------------------
-//   setAbove
-//---------------------------------------------------------
-
-void Symbol::setAbove(bool val)
-      {
-      setYoff(val ? -2.0 : 7.0);
-      }
-
-//---------------------------------------------------------
 //   layout
 //    height() and width() should return sensible
 //    values when calling this method
@@ -69,7 +60,7 @@ void Symbol::layout()
       //      e->layout();
       setbbox(_scoreFont ? _scoreFont->bbox(_sym, magS()) : symBbox(_sym));
       ElementLayout::layout(this);
-      BSymbol::layout();      // adjustReadPos() happens here
+      BSymbol::layout();
       }
 
 //---------------------------------------------------------
@@ -118,9 +109,6 @@ void Symbol::read(XmlReader& e)
                               // if symbol name not found, fall back to user names
                               // TODO : does it make sense? user names are probably localized
                               symId = Sym::userName2id(val);
-                              // if not found, look into old names
-                              if (symId == SymId::noSym)
-                                    symId = Sym::oldName2id(val);
                               if (symId == SymId::noSym) {
                                     qDebug("unknown symbol <%s>, falling back to no symbol", qPrintable(val));
                                     // set a default symbol, or layout() will crash
@@ -135,7 +123,6 @@ void Symbol::read(XmlReader& e)
             else if (tag == "Symbol") {
                   Symbol* s = new Symbol(score());
                   s->read(e);
-                  s->adjustReadPos();
                   add(s);
                   }
             else if (tag == "Image") {
@@ -153,68 +140,6 @@ void Symbol::read(XmlReader& e)
                   e.unknown();
             }
       setPos(pos);
-      }
-
-//---------------------------------------------------------
-//   dragAnchor
-//---------------------------------------------------------
-
-QLineF BSymbol::dragAnchor() const
-      {
-      if (parent() && parent()->type() == ElementType::SEGMENT) {
-            System* system = segment()->measure()->system();
-            qreal y        = system->staffCanvasYpage(staffIdx());
-//            QPointF anchor(segment()->pageX(), y);
-            QPointF anchor(segment()->canvasPos().x(), y);
-            return QLineF(canvasPos(), anchor);
-            }
-      else {
-            return QLineF(canvasPos(), parent()->canvasPos());
-            }
-      }
-
-//---------------------------------------------------------
-//   pagePos
-//---------------------------------------------------------
-
-QPointF BSymbol::pagePos() const
-      {
-      if (parent() && (parent()->type() == ElementType::SEGMENT)) {
-            QPointF p(pos());
-            System* system = segment()->measure()->system();
-            if (system) {
-                  p.ry() += system->staff(staffIdx())->y() + system->y();
-                  }
-            p.rx() = pageX();
-            return p;
-            }
-      else
-            return Element::pagePos();
-      }
-
-//---------------------------------------------------------
-//   canvasPos
-//---------------------------------------------------------
-
-QPointF BSymbol::canvasPos() const
-      {
-      if (parent() && (parent()->type() == ElementType::SEGMENT)) {
-            QPointF p(pos());
-            Segment* s = static_cast<Segment*>(parent());
-
-            System* system = s->measure()->system();
-            if (system) {
-                  int si = staffIdx();
-                  p.ry() += system->staff(si)->y() + system->y();
-                  Page* page = system->page();
-                  if (page)
-                        p.ry() += page->y();
-                  }
-            p.rx() = canvasX();
-            return p;
-            }
-      else
-            return Element::canvasPos();
       }
 
 //---------------------------------------------------------
@@ -304,7 +229,6 @@ void FSymbol::layout()
             s = QChar(_code);
       QFontMetricsF fm(_font, MScore::paintDevice());
       setbbox(fm.boundingRect(s));
-      adjustReadPos();
       }
 
 //---------------------------------------------------------

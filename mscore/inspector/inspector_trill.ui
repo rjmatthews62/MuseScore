@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>194</width>
-    <height>135</height>
+    <width>335</width>
+    <height>154</height>
    </rect>
   </property>
   <property name="accessibleName">
@@ -237,6 +237,9 @@
       </item>
       <item row="3" column="0" colspan="2">
        <widget class="QCheckBox" name="playArticulation">
+        <property name="accessibleName">
+         <string>Play</string>
+        </property>
         <property name="text">
          <string>Play</string>
         </property>

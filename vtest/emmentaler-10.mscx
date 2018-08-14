@@ -9,19 +9,28 @@
       </Synthesizer>
     <Division>480</Division>
     <Style>
+      <pageWidth>3.93701</pageWidth>
+      <pageHeight>3.54331</pageHeight>
+      <pagePrintableWidth>3.77953</pagePrintableWidth>
+      <pageEvenLeftMargin>0.0787403</pageEvenLeftMargin>
+      <pageOddLeftMargin>0.0787403</pageOddLeftMargin>
+      <pageEvenTopMargin>0</pageEvenTopMargin>
+      <pageEvenBottomMargin>0</pageEvenBottomMargin>
+      <pageOddTopMargin>0</pageOddTopMargin>
+      <pageOddBottomMargin>0</pageOddBottomMargin>
+      <pageTwosided>0</pageTwosided>
       <staffDistance>1</staffDistance>
+      <lyricsMinBottomDistance>4</lyricsMinBottomDistance>
+      <clefLeftMargin>0.64</clefLeftMargin>
+      <clefKeyRightMargin>1.75</clefKeyRightMargin>
+      <barNoteDistance>1.2</barNoteDistance>
+      <pedalPosBelow>0</pedalPosBelow>
+      <trillPosAbove>0</trillPosAbove>
       <showMeasureNumber>0</showMeasureNumber>
       <showFooter>0</showFooter>
-      <page-layout>
-        <page-height>510.236</page-height>
-        <page-width>566.929</page-width>
-        <page-margins type="both">
-          <left-margin>11.3386</left-margin>
-          <right-margin>11.3386</right-margin>
-          <top-margin>0</top-margin>
-          <bottom-margin>0</bottom-margin>
-          </page-margins>
-        </page-layout>
+      <dynamicsFontItalic>0</dynamicsFontItalic>
+      <staffTextPosAbove>-1</staffTextPosAbove>
+      <staffTextMinDistance>0.2</staffTextMinDistance>
       <Spatium>1.5</Spatium>
       </Style>
     <showInvisible>1</showInvisible>
@@ -41,18 +50,11 @@
     <metaTag name="translator"></metaTag>
     <metaTag name="workNumber"></metaTag>
     <metaTag name="workTitle"></metaTag>
-    <PageList>
-      <Page>
-        <System>
-          </System>
-        </Page>
-      </PageList>
     <Part>
       <Staff id="1">
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
-        <bracket type="-1" span="0"/>
         </Staff>
       <Staff id="2">
         <StaffType group="pitched">
@@ -125,21 +127,15 @@ p, li { white-space: pre-wrap; }
       </Part>
     <Staff id="1">
       <Measure number="1">
-        <Clef>
-          <concertClefType>G</concertClefType>
-          <transposingClefType>G</transposingClefType>
-          </Clef>
         <TimeSig>
           <sigN>8</sigN>
           <sigD>4</sigD>
-          <showCourtesySig>0</showCourtesySig>
           </TimeSig>
         <StaffText>
-          <pos x="-5" y="-5.5"/>
+          <pos x="-5" y="-4.5"/>
           <text>Emmentaler note-heads</text>
           </StaffText>
         <StaffText>
-          <pos x="0" y="-2.5"/>
           <text>Normal</text>
           </StaffText>
         <Chord>
@@ -177,12 +173,10 @@ p, li { white-space: pre-wrap; }
           </Rest>
         <BarLine>
           <subtype>double</subtype>
-          <span>1</span>
           </BarLine>
         </Measure>
       <Measure number="3">
         <StaffText>
-          <pos x="0" y="-2.5"/>
           <text>Cross</text>
           </StaffText>
         <Chord>
@@ -223,24 +217,17 @@ p, li { white-space: pre-wrap; }
           <durationType>quarter</durationType>
           </Rest>
         <BarLine>
-          <subtype>end</subtype>
-          <span>1</span>
+          <subtype>normal</subtype>
           </BarLine>
         </Measure>
       </Staff>
     <Staff id="2">
       <Measure number="1">
-        <Clef>
-          <concertClefType>G</concertClefType>
-          <transposingClefType>G</transposingClefType>
-          </Clef>
         <TimeSig>
           <sigN>8</sigN>
           <sigD>4</sigD>
-          <showCourtesySig>0</showCourtesySig>
           </TimeSig>
         <StaffText>
-          <pos x="0" y="-2.5"/>
           <text>Diamond</text>
           </StaffText>
         <Chord>
@@ -282,12 +269,10 @@ p, li { white-space: pre-wrap; }
           </Rest>
         <BarLine>
           <subtype>double</subtype>
-          <span>1</span>
           </BarLine>
         </Measure>
       <Measure number="3">
         <StaffText>
-          <pos x="0" y="-2.5"/>
           <text>Triangel</text>
           </StaffText>
         <Chord>
@@ -295,7 +280,7 @@ p, li { white-space: pre-wrap; }
           <Note>
             <pitch>67</pitch>
             <tpc>15</tpc>
-            <head>triangle</head>
+            <head>triangle-down</head>
             </Note>
           </Chord>
         </Measure>
@@ -305,7 +290,7 @@ p, li { white-space: pre-wrap; }
           <Note>
             <pitch>67</pitch>
             <tpc>15</tpc>
-            <head>triangle</head>
+            <head>triangle-down</head>
             </Note>
           </Chord>
         <Chord>
@@ -313,7 +298,7 @@ p, li { white-space: pre-wrap; }
           <Note>
             <pitch>67</pitch>
             <tpc>15</tpc>
-            <head>triangle</head>
+            <head>triangle-down</head>
             </Note>
           </Chord>
         <Chord>
@@ -321,31 +306,24 @@ p, li { white-space: pre-wrap; }
           <Note>
             <pitch>67</pitch>
             <tpc>15</tpc>
-            <head>triangle</head>
+            <head>triangle-down</head>
             </Note>
           </Chord>
         <Rest>
           <durationType>quarter</durationType>
           </Rest>
         <BarLine>
-          <subtype>end</subtype>
-          <span>1</span>
+          <subtype>normal</subtype>
           </BarLine>
         </Measure>
       </Staff>
     <Staff id="3">
       <Measure number="1">
-        <Clef>
-          <concertClefType>G</concertClefType>
-          <transposingClefType>G</transposingClefType>
-          </Clef>
         <TimeSig>
           <sigN>8</sigN>
           <sigD>4</sigD>
-          <showCourtesySig>0</showCourtesySig>
           </TimeSig>
         <StaffText>
-          <pos x="0" y="-2.5"/>
           <text>Slash</text>
           </StaffText>
         <Chord>
@@ -387,12 +365,10 @@ p, li { white-space: pre-wrap; }
           </Rest>
         <BarLine>
           <subtype>double</subtype>
-          <span>1</span>
           </BarLine>
         </Measure>
       <Measure number="3">
         <StaffText>
-          <pos x="0" y="-2.5"/>
           <text>XCircle</text>
           </StaffText>
         <Chord>
@@ -433,24 +409,17 @@ p, li { white-space: pre-wrap; }
           <durationType>quarter</durationType>
           </Rest>
         <BarLine>
-          <subtype>end</subtype>
-          <span>1</span>
+          <subtype>normal</subtype>
           </BarLine>
         </Measure>
       </Staff>
     <Staff id="4">
       <Measure number="1">
-        <Clef>
-          <concertClefType>G</concertClefType>
-          <transposingClefType>G</transposingClefType>
-          </Clef>
         <TimeSig>
           <sigN>8</sigN>
           <sigD>4</sigD>
-          <showCourtesySig>0</showCourtesySig>
           </TimeSig>
         <StaffText>
-          <pos x="0" y="-2.5"/>
           <text>Do</text>
           </StaffText>
         <Chord>
@@ -492,12 +461,10 @@ p, li { white-space: pre-wrap; }
           </Rest>
         <BarLine>
           <subtype>double</subtype>
-          <span>1</span>
           </BarLine>
         </Measure>
       <Measure number="3">
         <StaffText>
-          <pos x="0" y="-2.5"/>
           <text>Re</text>
           </StaffText>
         <Chord>
@@ -538,24 +505,17 @@ p, li { white-space: pre-wrap; }
           <durationType>quarter</durationType>
           </Rest>
         <BarLine>
-          <subtype>end</subtype>
-          <span>1</span>
+          <subtype>normal</subtype>
           </BarLine>
         </Measure>
       </Staff>
     <Staff id="5">
       <Measure number="1">
-        <Clef>
-          <concertClefType>G</concertClefType>
-          <transposingClefType>G</transposingClefType>
-          </Clef>
         <TimeSig>
           <sigN>8</sigN>
           <sigD>4</sigD>
-          <showCourtesySig>0</showCourtesySig>
           </TimeSig>
         <StaffText>
-          <pos x="0" y="-2.5"/>
           <text>Mi</text>
           </StaffText>
         <Chord>
@@ -597,12 +557,10 @@ p, li { white-space: pre-wrap; }
           </Rest>
         <BarLine>
           <subtype>double</subtype>
-          <span>1</span>
           </BarLine>
         </Measure>
       <Measure number="3">
         <StaffText>
-          <pos x="0" y="-2.5"/>
           <text>Fa</text>
           </StaffText>
         <Chord>
@@ -643,24 +601,17 @@ p, li { white-space: pre-wrap; }
           <durationType>quarter</durationType>
           </Rest>
         <BarLine>
-          <subtype>end</subtype>
-          <span>1</span>
+          <subtype>normal</subtype>
           </BarLine>
         </Measure>
       </Staff>
     <Staff id="6">
       <Measure number="1">
-        <Clef>
-          <concertClefType>G</concertClefType>
-          <transposingClefType>G</transposingClefType>
-          </Clef>
         <TimeSig>
           <sigN>8</sigN>
           <sigD>4</sigD>
-          <showCourtesySig>0</showCourtesySig>
           </TimeSig>
         <StaffText>
-          <pos x="0" y="-2.5"/>
           <text>Sol</text>
           </StaffText>
         <Chord>
@@ -702,12 +653,10 @@ p, li { white-space: pre-wrap; }
           </Rest>
         <BarLine>
           <subtype>double</subtype>
-          <span>1</span>
           </BarLine>
         </Measure>
       <Measure number="3">
         <StaffText>
-          <pos x="0" y="-2.5"/>
           <text>La</text>
           </StaffText>
         <Chord>
@@ -748,24 +697,17 @@ p, li { white-space: pre-wrap; }
           <durationType>quarter</durationType>
           </Rest>
         <BarLine>
-          <subtype>end</subtype>
-          <span>1</span>
+          <subtype>normal</subtype>
           </BarLine>
         </Measure>
       </Staff>
     <Staff id="7">
       <Measure number="1">
-        <Clef>
-          <concertClefType>G</concertClefType>
-          <transposingClefType>G</transposingClefType>
-          </Clef>
         <TimeSig>
           <sigN>8</sigN>
           <sigD>4</sigD>
-          <showCourtesySig>0</showCourtesySig>
           </TimeSig>
         <StaffText>
-          <pos x="0" y="-2.5"/>
           <text>Ti</text>
           </StaffText>
         <Chord>
@@ -807,12 +749,10 @@ p, li { white-space: pre-wrap; }
           </Rest>
         <BarLine>
           <subtype>double</subtype>
-          <span>1</span>
           </BarLine>
         </Measure>
       <Measure number="3">
         <StaffText>
-          <pos x="0" y="-2.5"/>
           <text>Alt. Brevis</text>
           </StaffText>
         <Chord>
@@ -871,8 +811,7 @@ p, li { white-space: pre-wrap; }
           <durationType>quarter</durationType>
           </Rest>
         <BarLine>
-          <subtype>end</subtype>
-          <span>1</span>
+          <subtype>normal</subtype>
           </BarLine>
         </Measure>
       </Staff>

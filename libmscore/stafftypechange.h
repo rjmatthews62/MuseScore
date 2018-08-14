@@ -23,9 +23,7 @@ class StaffType;
 //   @@ StaffTypeChange
 //---------------------------------------------------------
 
-class StaffTypeChange : public Element {
-      Q_GADGET
-
+class StaffTypeChange final : public Element {
       StaffType* _staffType { 0 };
       qreal lw;
 
@@ -39,7 +37,6 @@ class StaffTypeChange : public Element {
       virtual StaffTypeChange* clone() const override { return new StaffTypeChange(*this); }
 
       virtual ElementType type() const override { return ElementType::STAFFTYPE_CHANGE; }
-      virtual bool systemFlag() const override    { return false;  }
 
       virtual void write(XmlWriter&) const override;
       virtual void read(XmlReader&) override;
@@ -47,11 +44,11 @@ class StaffTypeChange : public Element {
       StaffType* staffType() const     { return _staffType; }
       void setStaffType(StaffType* st) { _staffType = st; }
 
-      Measure* measure() const            { return (Measure*)parent();   }
+      Measure* measure() const         { return toMeasure(parent());   }
 
-      virtual QVariant getProperty(P_ID propertyId) const override;
-      virtual bool setProperty(P_ID propertyId, const QVariant&) override;
-      virtual QVariant propertyDefault(P_ID) const override;
+      virtual QVariant getProperty(Pid propertyId) const override;
+      virtual bool setProperty(Pid propertyId, const QVariant&) override;
+      virtual QVariant propertyDefault(Pid) const override;
       };
 
 

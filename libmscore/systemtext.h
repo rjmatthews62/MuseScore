@@ -21,17 +21,17 @@ namespace Ms {
 //   SystemText
 //---------------------------------------------------------
 
-class SystemText : public StaffText  {
-      Q_GADGET
+class SystemText final : public StaffTextBase  {
+      virtual void layout() override;
 
    public:
-      SystemText(Score* score);
-      SystemText(SubStyle, Score* = 0);
+      SystemText(Score*);
+      SystemText(Score*, Tid, ElementFlags = ElementFlag::NOTHING);
+
       virtual SystemText* clone() const override    { return new SystemText(*this); }
       virtual ElementType type() const override     { return ElementType::SYSTEM_TEXT; }
       Segment* segment() const                      { return (Segment*)parent(); }
-      virtual QVariant propertyDefault(P_ID id) const override;
-      virtual void write(XmlWriter& xml) const;
+      virtual QVariant propertyDefault(Pid id) const override;
       };
 
 

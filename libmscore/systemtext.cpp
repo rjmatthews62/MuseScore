@@ -14,47 +14,52 @@
 
 namespace Ms {
 
+static const ElementStyle systemStyle {
+      { Sid::systemTextPlacement,                Pid::PLACEMENT              },
+      };
+
 //---------------------------------------------------------
 //   SystemText
 //---------------------------------------------------------
 
 SystemText::SystemText(Score* s)
-   : StaffText(SubStyle::SYSTEM, s)
+   : StaffTextBase(s, Tid::SYSTEM, ElementFlag::SYSTEM)
       {
-      setSystemFlag(true);
+      initElementStyle(&systemStyle);
       }
 
-SystemText::SystemText(SubStyle ss, Score* s)
-   : StaffText(ss, s)
+SystemText::SystemText(Score* s, Tid tid, ElementFlags flags)
+   : StaffTextBase(s, tid, flags)
       {
-      setSystemFlag(true);
+      initElementStyle(&systemStyle);
       }
 
 //---------------------------------------------------------
 //   propertyDefault
 //---------------------------------------------------------
 
-QVariant SystemText::propertyDefault(P_ID id) const
+QVariant SystemText::propertyDefault(Pid id) const
       {
       switch (id) {
-            case P_ID::SUB_STYLE:
-                  return int(SubStyle::SYSTEM);
+            case Pid::SUB_STYLE:
+                  return int(Tid::SYSTEM);
             default:
-                  return StaffText::propertyDefault(id);
+                  return TextBase::propertyDefault(id);
             }
       }
 
 //---------------------------------------------------------
-//   write
+//   layout
 //---------------------------------------------------------
 
-void SystemText::write(XmlWriter& xml) const
+void SystemText::layout()
       {
-      if (!xml.canWrite(this))
-            return;
-      xml.stag(name());
-      StaffText::writeProperties(xml);
-      xml.etag();
+      Staff* s = staff();
+      qreal y = placeAbove() ? styleP(Sid::systemTextPosAbove) : styleP(Sid::systemTextPosBelow) + (s ? s->height() : 0.0);
+      QPointF o(offset() * (offsetType() == OffsetType::SPATIUM ? spatium() : DPI));
+      setPos(o + QPointF(0.0, y));
+      TextBase::layout1();
+      autoplaceSegmentElement(styleP(Sid::systemTextMinDistance));
       }
 
 } // namespace Ms

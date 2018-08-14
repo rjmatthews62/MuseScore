@@ -27,16 +27,16 @@ InspectorFingering::InspectorFingering(QWidget* parent)
       f.setupUi(addWidget());
 
       const std::vector<InspectorItem> iiList = {
-            { P_ID::SUB_STYLE, 0, f.subStyle,     f.resetSubStyle     },
+            { Pid::SUB_STYLE, 0, f.style,     f.resetStyle     },
             };
       const std::vector<InspectorPanel> ppList = {
             { f.title, f.panel }
             };
 
-      f.subStyle->clear();
-      for (auto ss : { SubStyle::FINGERING, SubStyle::LH_GUITAR_FINGERING, SubStyle::RH_GUITAR_FINGERING, SubStyle::STRING_NUMBER } )
+      f.style->clear();
+      for (auto ss : { Tid::FINGERING, Tid::LH_GUITAR_FINGERING, Tid::RH_GUITAR_FINGERING, Tid::STRING_NUMBER } )
             {
-            f.subStyle->addItem(subStyleUserName(ss), int(ss));
+            f.style->addItem(textStyleUserName(ss), int(ss));
             }
 
       mapSignals(iiList, ppList);

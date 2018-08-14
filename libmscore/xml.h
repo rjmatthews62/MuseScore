@@ -39,11 +39,19 @@ struct SpannerValues {
       };
 
 //---------------------------------------------------------
+//   TextStyleMap
+//---------------------------------------------------------
+
+struct TextStyleMap {
+      QString name;
+      Tid ss;
+      };
+
+//---------------------------------------------------------
 //   XmlReader
 //---------------------------------------------------------
 
 class XmlReader : public QXmlStreamReader {
-      Score* _score;
       QString docName;  // used for error reporting
 
       // Score read context (for read optimizations):
@@ -65,11 +73,13 @@ class XmlReader : public QXmlStreamReader {
       QMap<int, LinkedElements*> _elinks;
       QMultiMap<int, int> _tracks;
 
+      QList<TextStyleMap> userTextStyles;
+
    public:
-      XmlReader(Score* s, QFile* f) : QXmlStreamReader(f), _score(s), docName(f->fileName()) {}
-      XmlReader(Score* s, const QByteArray& d, const QString& st = QString()) : QXmlStreamReader(d), _score(s), docName(st)  {}
-      XmlReader(Score* s, QIODevice* d, const QString& st = QString()) : QXmlStreamReader(d), _score(s), docName(st) {}
-      XmlReader(Score* s, const QString& d, const QString& st = QString()) : QXmlStreamReader(d), _score(s), docName(st) {}
+      XmlReader(QFile* f) : QXmlStreamReader(f), docName(f->fileName()) {}
+      XmlReader(const QByteArray& d, const QString& st = QString()) : QXmlStreamReader(d), docName(st)  {}
+      XmlReader(QIODevice* d, const QString& st = QString()) : QXmlStreamReader(d), docName(st) {}
+      XmlReader(const QString& d, const QString& st = QString()) : QXmlStreamReader(d), docName(st) {}
 
       bool hasAccidental;                     // used for userAccidental backward compatibility
       void unknown();
@@ -137,6 +147,8 @@ class XmlReader : public QXmlStreamReader {
       QMultiMap<int, int>& tracks()         { return _tracks;     }
 
       void checkTuplets();
+      Tid addUserTextStyle(const QString& name);
+      Tid lookupUserTextStyle(const QString& name);
       };
 
 //---------------------------------------------------------
@@ -211,8 +223,8 @@ class XmlWriter : public QTextStream {
       void ntag(const char* name);
       void netag(const char* name);
 
-      void tag(P_ID id, void* data, void* defaultVal);
-      void tag(P_ID id, QVariant data, QVariant defaultData = QVariant());
+      void tag(Pid id, void* data, void* defaultVal);
+      void tag(Pid id, QVariant data, QVariant defaultData = QVariant());
       void tag(const char* name, QVariant data, QVariant defaultData = QVariant());
       void tag(const QString&, QVariant data);
       void tag(const char* name, const char* s)    { tag(name, QVariant(s)); }

@@ -92,43 +92,42 @@
           <sigN>4</sigN>
           <sigD>4</sigD>
           </TimeSig>
+        <Fermata>
+          <subtype>fermataAbove</subtype>
+          </Fermata>
         <Chord>
           <durationType>quarter</durationType>
-          <Articulation>
-            <subtype>fermataAbove</subtype>
-            </Articulation>
           <Note>
             <pitch>72</pitch>
             <tpc>14</tpc>
             </Note>
           </Chord>
+        <Fermata>
+          <subtype>fermataAbove</subtype>
+          </Fermata>
         <Chord>
           <durationType>quarter</durationType>
-          <Articulation>
-            <subtype>fermataAbove</subtype>
-            </Articulation>
           <Note>
             <pitch>60</pitch>
             <tpc>14</tpc>
             </Note>
           </Chord>
+        <Fermata>
+          <subtype>fermataAbove</subtype>
+          </Fermata>
         <Chord>
           <durationType>quarter</durationType>
-          <Articulation>
-            <direction>up</direction>
-            <subtype>fermataAbove</subtype>
-            </Articulation>
           <Note>
             <pitch>72</pitch>
             <tpc>14</tpc>
             </Note>
           </Chord>
+        <Fermata>
+          <subtype>fermataBelow</subtype>
+          <placement>below</placement>
+          </Fermata>
         <Chord>
           <durationType>quarter</durationType>
-          <Articulation>
-            <direction>down</direction>
-            <subtype>fermataBelow</subtype>
-            </Articulation>
           <Note>
             <pitch>60</pitch>
             <tpc>14</tpc>
@@ -136,43 +135,42 @@
           </Chord>
         </Measure>
       <Measure number="2">
+        <Fermata>
+          <subtype>fermataShortAbove</subtype>
+          </Fermata>
         <Chord>
           <durationType>quarter</durationType>
-          <Articulation>
-            <subtype>fermataShortAbove</subtype>
-            </Articulation>
           <Note>
             <pitch>72</pitch>
             <tpc>14</tpc>
             </Note>
           </Chord>
+        <Fermata>
+          <subtype>fermataShortAbove</subtype>
+          </Fermata>
         <Chord>
           <durationType>quarter</durationType>
-          <Articulation>
-            <subtype>fermataShortAbove</subtype>
-            </Articulation>
           <Note>
             <pitch>60</pitch>
             <tpc>14</tpc>
             </Note>
           </Chord>
+        <Fermata>
+          <subtype>fermataShortAbove</subtype>
+          </Fermata>
         <Chord>
           <durationType>quarter</durationType>
-          <Articulation>
-            <direction>up</direction>
-            <subtype>fermataShortAbove</subtype>
-            </Articulation>
           <Note>
             <pitch>72</pitch>
             <tpc>14</tpc>
             </Note>
           </Chord>
+        <Fermata>
+          <subtype>fermataShortBelow</subtype>
+          <placement>below</placement>
+          </Fermata>
         <Chord>
           <durationType>quarter</durationType>
-          <Articulation>
-            <direction>down</direction>
-            <subtype>fermataShortBelow</subtype>
-            </Articulation>
           <Note>
             <pitch>60</pitch>
             <tpc>14</tpc>
@@ -180,43 +178,42 @@
           </Chord>
         </Measure>
       <Measure number="3">
+        <Fermata>
+          <subtype>fermataLongAbove</subtype>
+          </Fermata>
         <Chord>
           <durationType>quarter</durationType>
-          <Articulation>
-            <subtype>fermataLongAbove</subtype>
-            </Articulation>
           <Note>
             <pitch>72</pitch>
             <tpc>14</tpc>
             </Note>
           </Chord>
+        <Fermata>
+          <subtype>fermataLongAbove</subtype>
+          </Fermata>
         <Chord>
           <durationType>quarter</durationType>
-          <Articulation>
-            <subtype>fermataLongAbove</subtype>
-            </Articulation>
           <Note>
             <pitch>60</pitch>
             <tpc>14</tpc>
             </Note>
           </Chord>
+        <Fermata>
+          <subtype>fermataLongAbove</subtype>
+          </Fermata>
         <Chord>
           <durationType>quarter</durationType>
-          <Articulation>
-            <direction>up</direction>
-            <subtype>fermataLongAbove</subtype>
-            </Articulation>
           <Note>
             <pitch>72</pitch>
             <tpc>14</tpc>
             </Note>
           </Chord>
+        <Fermata>
+          <subtype>fermataLongBelow</subtype>
+          <placement>below</placement>
+          </Fermata>
         <Chord>
           <durationType>quarter</durationType>
-          <Articulation>
-            <direction>down</direction>
-            <subtype>fermataLongBelow</subtype>
-            </Articulation>
           <Note>
             <pitch>60</pitch>
             <tpc>14</tpc>
@@ -227,43 +224,42 @@
         <LayoutBreak>
           <subtype>line</subtype>
           </LayoutBreak>
+        <Fermata>
+          <subtype>fermataVeryLongAbove</subtype>
+          </Fermata>
         <Chord>
           <durationType>quarter</durationType>
-          <Articulation>
-            <subtype>fermataVeryLongAbove</subtype>
-            </Articulation>
           <Note>
             <pitch>72</pitch>
             <tpc>14</tpc>
             </Note>
           </Chord>
+        <Fermata>
+          <subtype>fermataVeryLongAbove</subtype>
+          </Fermata>
         <Chord>
           <durationType>quarter</durationType>
-          <Articulation>
-            <subtype>fermataVeryLongAbove</subtype>
-            </Articulation>
           <Note>
             <pitch>60</pitch>
             <tpc>14</tpc>
             </Note>
           </Chord>
+        <Fermata>
+          <subtype>fermataVeryLongAbove</subtype>
+          </Fermata>
         <Chord>
           <durationType>quarter</durationType>
-          <Articulation>
-            <direction>up</direction>
-            <subtype>fermataVeryLongAbove</subtype>
-            </Articulation>
           <Note>
             <pitch>72</pitch>
             <tpc>14</tpc>
             </Note>
           </Chord>
+        <Fermata>
+          <subtype>fermataVeryLongBelow</subtype>
+          <placement>below</placement>
+          </Fermata>
         <Chord>
           <durationType>quarter</durationType>
-          <Articulation>
-            <direction>down</direction>
-            <subtype>fermataVeryLongBelow</subtype>
-            </Articulation>
           <Note>
             <pitch>60</pitch>
             <tpc>14</tpc>
@@ -1348,7 +1344,7 @@
         <Chord>
           <durationType>quarter</durationType>
           <Articulation>
-            <subtype>ornamentDownPrall</subtype>
+            <subtype>ornamentPrecompMordentUpperPrefix</subtype>
             </Articulation>
           <Note>
             <pitch>72</pitch>
@@ -1358,7 +1354,7 @@
         <Chord>
           <durationType>quarter</durationType>
           <Articulation>
-            <subtype>ornamentDownPrall</subtype>
+            <subtype>ornamentPrecompMordentUpperPrefix</subtype>
             </Articulation>
           <Note>
             <pitch>60</pitch>
@@ -1369,7 +1365,7 @@
           <durationType>quarter</durationType>
           <Articulation>
             <direction>up</direction>
-            <subtype>ornamentDownPrall</subtype>
+            <subtype>ornamentPrecompMordentUpperPrefix</subtype>
             </Articulation>
           <Note>
             <pitch>72</pitch>
@@ -1380,7 +1376,7 @@
           <durationType>quarter</durationType>
           <Articulation>
             <direction>down</direction>
-            <subtype>ornamentDownPrall</subtype>
+            <subtype>ornamentPrecompMordentUpperPrefix</subtype>
             </Articulation>
           <Note>
             <pitch>60</pitch>
@@ -1833,7 +1829,34 @@
             <tpc>14</tpc>
             </Note>
           </Chord>
+        </Measure>
+      <Measure number="40">
+        <Fermata>
+          <subtype>fermataAbove</subtype>
+          </Fermata>
+        <Rest>
+          <durationType>quarter</durationType>
+          </Rest>
+        <Fermata>
+          <subtype>fermataShortAbove</subtype>
+          </Fermata>
+        <Rest>
+          <durationType>quarter</durationType>
+          </Rest>
+        <Fermata>
+          <subtype>fermataLongAbove</subtype>
+          </Fermata>
+        <Rest>
+          <durationType>quarter</durationType>
+          </Rest>
+        <Fermata>
+          <subtype>fermataVeryLongAbove</subtype>
+          </Fermata>
+        <Rest>
+          <durationType>quarter</durationType>
+          </Rest>
         <BarLine>
+          <subtype>end</subtype>
           </BarLine>
         </Measure>
       </Staff>

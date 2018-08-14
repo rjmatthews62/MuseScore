@@ -10,6 +10,13 @@
 //  the file LICENCE.GPL
 //=============================================================================
 
+#if (defined (_MSCVER) || defined (_MSC_VER))
+// Include stdint.h and #define _STDINT_H to prevent <systemdeps.h> from redefining types
+// #undef UNICODE to force LoadLibrary to use the char-based implementation instead of the wchar_t one.
+#include <stdint.h>
+#define _STDINT_H 1  
+#endif
+
 #include "config.h"
 #include "preferences.h"
 #include "driver.h"
@@ -32,6 +39,9 @@ namespace Ms {
 extern Driver* getPulseAudioDriver(Seq*);
 #endif
 
+bool alsaIsUsed = false, jackIsUsed = false, portAudioIsUsed = false, pulseAudioIsUsed = false;
+
+
 //---------------------------------------------------------
 //   driverFactory
 //    driver can be: jack alsa pulse portaudio
@@ -41,10 +51,10 @@ Driver* driverFactory(Seq* seq, QString driverName)
       {
       Driver* driver = 0;
 #if 1 // DEBUG: force "no audio"
-      bool useJackFlag       = (preferences.useJackAudio || preferences.useJackMidi);
-      bool useAlsaFlag       = preferences.useAlsaAudio;
-      bool usePortaudioFlag  = preferences.usePortaudioAudio;
-      bool usePulseAudioFlag = preferences.usePulseAudio;
+      bool useJackFlag       = (preferences.getBool(PREF_IO_JACK_USEJACKAUDIO) || preferences.getBool(PREF_IO_JACK_USEJACKMIDI));
+      bool useAlsaFlag       = preferences.getBool(PREF_IO_ALSA_USEALSAAUDIO);
+      bool usePortaudioFlag  = preferences.getBool(PREF_IO_PORTAUDIO_USEPORTAUDIO);
+      bool usePulseAudioFlag = preferences.getBool(PREF_IO_PULSEAUDIO_USEPULSEAUDIO);
 
       if (!driverName.isEmpty()) {
             driverName        = driverName.toLower();
@@ -62,10 +72,10 @@ Driver* driverFactory(Seq* seq, QString driverName)
                   usePortaudioFlag = true;
             }
 
-      useALSA       = false;
-      useJACK       = false;
-      usePortaudio  = false;
-      usePulseAudio = false;
+      alsaIsUsed       = false;
+      jackIsUsed       = false;
+      portAudioIsUsed  = false;
+      pulseAudioIsUsed = false;
 
 #ifdef USE_PULSEAUDIO
       if (usePulseAudioFlag) {
@@ -76,7 +86,7 @@ Driver* driverFactory(Seq* seq, QString driverName)
                   driver = 0;
                   }
             else
-                  usePulseAudio = true;
+                  pulseAudioIsUsed = true;
             }
 #else
       (void)usePulseAudioFlag; // avoid compiler warning
@@ -90,7 +100,7 @@ Driver* driverFactory(Seq* seq, QString driverName)
                   driver = 0;
                   }
             else
-                  usePortaudio = true;
+                  portAudioIsUsed = true;
             }
 #else
       (void)usePortaudioFlag; // avoid compiler warning
@@ -104,7 +114,7 @@ Driver* driverFactory(Seq* seq, QString driverName)
                   driver = 0;
                   }
             else {
-                  useALSA = true;
+                  alsaIsUsed = true;
                   }
             }
 #else
@@ -121,7 +131,7 @@ Driver* driverFactory(Seq* seq, QString driverName)
                   driver = 0;
                   }
             else
-                  useJACK = true;
+                  jackIsUsed = true;
             }
 #else
        (void)useJackFlag; // avoid compiler warning

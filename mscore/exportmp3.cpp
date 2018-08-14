@@ -80,7 +80,7 @@ bool MP3Exporter::findLibrary()
            path,
            getLibraryTypeString(),
            0,
-           preferences.nativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog
+           preferences.getBool(PREF_UI_APP_USENATIVEDIALOGS) ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog
            );
 
       if (libPath.isEmpty())
@@ -193,9 +193,6 @@ bool MP3Exporter::initLibrary(QString libpath)
             qDebug("load failed <%s>", qPrintable(lame_lib->errorString()));
             return false;
             }
-
-      /*qDebug("Actual LAME path %s",
-                FileNames::PathFromAddr(lame_lib->resolve("lame_init")));*/
 
       lame_init = (lame_init_t *)
         lame_lib->resolve("lame_init");
@@ -576,7 +573,7 @@ QString MP3Exporter::getLibraryTypeString()
 
 QString MP3Exporter::getLibraryPath()
       {
-      return QString("/usr/local/lib/audacity");
+      return QString("%1/../Resources/Frameworks/").arg(qApp->applicationDirPath());
       }
 
 QString MP3Exporter::getLibraryName()

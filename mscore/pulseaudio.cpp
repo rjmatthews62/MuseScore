@@ -72,7 +72,7 @@ void PulseAudio::paCallback(pa_stream* s, size_t len, void* data)
 PulseAudio::PulseAudio(Seq* s)
    : Driver(s)
       {
-      _sampleRate = preferences.alsaSampleRate;
+      _sampleRate = preferences.getInt(PREF_IO_ALSA_SAMPLERATE);
       state       = Transport::STOP;
       runState    = 0;
       }
@@ -173,8 +173,9 @@ void* PulseAudio::paLoop(void* data)
       {
       PulseAudio* pa = (PulseAudio*)data;
       pa->runState = 2;
-      while (pa->runState == 2)
+      while (pa->runState == 2) {
             pa_mainloop_iterate(pa->pa_ml, 1, NULL);
+            }
       pa->runState = 0;
       return 0;
       }

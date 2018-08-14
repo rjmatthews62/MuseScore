@@ -2,7 +2,7 @@
 //  MuseScore
 //  Music Composition & Notation
 //
-//  Copyright (C) 2010-2011 Werner Schweer
+//  Copyright (C) 2010-2018 Werner Schweer
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License version 2
@@ -22,39 +22,36 @@
 
 namespace Ms {
 
+static const ElementStyle fingeringStyle {
+      { Sid::fingeringFontFace,                  Pid::FONT_FACE              },
+      { Sid::fingeringFontSize,                  Pid::FONT_SIZE              },
+      { Sid::fingeringFontBold,                  Pid::FONT_BOLD              },
+      { Sid::fingeringFontItalic,                Pid::FONT_ITALIC            },
+      { Sid::fingeringFontUnderline,             Pid::FONT_UNDERLINE         },
+      { Sid::fingeringAlign,                     Pid::ALIGN                  },
+      { Sid::fingeringFrameType,                 Pid::FRAME_TYPE             },
+      { Sid::fingeringFramePadding,              Pid::FRAME_PADDING          },
+      { Sid::fingeringFrameWidth,                Pid::FRAME_WIDTH            },
+      { Sid::fingeringFrameRound,                Pid::FRAME_ROUND            },
+      { Sid::fingeringFrameFgColor,              Pid::FRAME_FG_COLOR         },
+      { Sid::fingeringFrameBgColor,              Pid::FRAME_BG_COLOR         },
+      { Sid::fingeringOffset,                    Pid::OFFSET                 },
+      };
+
 //---------------------------------------------------------
 //   Fingering
+//      Element(Score* = 0, ElementFlags = ElementFlag::NOTHING);
 //---------------------------------------------------------
 
-Fingering::Fingering(Score* s)
-  : Text(SubStyle::FINGERING, s)
+Fingering::Fingering(Score* s, Tid tid, ElementFlags ef)
+   : TextBase(s, tid, ef)
       {
-      setFlag(ElementFlag::HAS_TAG, true);      // this is a layered element
+      initElementStyle(&fingeringStyle);
       }
 
-//---------------------------------------------------------
-//   write
-//---------------------------------------------------------
-
-void Fingering::write(XmlWriter& xml) const
+Fingering::Fingering(Score* s, ElementFlags ef)
+  : Fingering(s, Tid::FINGERING, ef)
       {
-      if (!xml.canWrite(this))
-            return;
-      xml.stag(name());
-      Text::writeProperties(xml);
-      xml.etag();
-      }
-
-//---------------------------------------------------------
-//   read
-//---------------------------------------------------------
-
-void Fingering::read(XmlReader& e)
-      {
-      while (e.readNextStartElement()) {
-            if (!Text::readProperties(e))
-                  e.unknown();
-            }
       }
 
 //---------------------------------------------------------
@@ -63,7 +60,7 @@ void Fingering::read(XmlReader& e)
 
 void Fingering::layout()
       {
-      Text::layout();
+      TextBase::layout();
 
       if (autoplace() && note()) {
             Chord* chord = note()->chord();
@@ -76,7 +73,7 @@ void Fingering::layout()
 
             qreal x = 0.0;
             qreal y = 0.0;
-            qreal headWidth = note()->headWidth();
+            qreal headWidth = note()->bboxRightPos();
             qreal headHeight = note()->headHeight();
             qreal fh = headHeight;        // TODO: fingering number height
 
@@ -124,7 +121,7 @@ void Fingering::layout()
 
 void Fingering::draw(QPainter* painter) const
       {
-      Text::draw(painter);
+      TextBase::draw(painter);
       }
 
 //---------------------------------------------------------
@@ -134,115 +131,23 @@ void Fingering::draw(QPainter* painter) const
 QString Fingering::accessibleInfo() const
       {
       QString rez = Element::accessibleInfo();
-      if (subStyle() == SubStyle::STRING_NUMBER) {
+      if (tid() == Tid::STRING_NUMBER)
             rez += " " + QObject::tr("String number");
-            }
       return QString("%1: %2").arg(rez).arg(plainText());
-      }
-
-//---------------------------------------------------------
-//   getProperty
-//---------------------------------------------------------
-
-QVariant Fingering::getProperty(P_ID propertyId) const
-      {
-      switch (propertyId) {
-            default:
-                  return Text::getProperty(propertyId);
-            }
-      }
-
-//---------------------------------------------------------
-//   setProperty
-//---------------------------------------------------------
-
-bool Fingering::setProperty(P_ID propertyId, const QVariant& v)
-      {
-      switch (propertyId) {
-            default:
-                  return Text::setProperty(propertyId, v);
-            }
-      triggerLayout();
-      return true;
       }
 
 //---------------------------------------------------------
 //   propertyDefault
 //---------------------------------------------------------
 
-QVariant Fingering::propertyDefault(P_ID id) const
+QVariant Fingering::propertyDefault(Pid id) const
       {
       switch (id) {
-            case P_ID::SUB_STYLE:
-                  return int(SubStyle::FINGERING);
+            case Pid::SUB_STYLE:
+                  return int(Tid::FINGERING);
             default:
-                  return Text::propertyDefault(id);
+                  return TextBase::propertyDefault(id);
             }
-      }
-
-//---------------------------------------------------------
-//   propertyStyle
-//---------------------------------------------------------
-
-PropertyFlags Fingering::propertyFlags(P_ID id) const
-      {
-      switch (id) {
-            default:
-                  return Text::propertyFlags(id);
-            }
-      }
-
-//---------------------------------------------------------
-//   resetProperty
-//---------------------------------------------------------
-
-void Fingering::resetProperty(P_ID id)
-      {
-      switch (id) {
-            default:
-                  return Text::resetProperty(id);
-            }
-      }
-
-//---------------------------------------------------------
-//   getPropertyStyle
-//---------------------------------------------------------
-
-StyleIdx Fingering::getPropertyStyle(P_ID id) const
-      {
-      switch (id) {
-            default:
-                  return Text::getPropertyStyle(id);
-            }
-      return StyleIdx::NOSTYLE;
-      }
-
-//---------------------------------------------------------
-//   styleChanged
-//    reset all styled values to actual style
-//---------------------------------------------------------
-
-void Fingering::styleChanged()
-      {
-      Text::styleChanged();
-      }
-
-//---------------------------------------------------------
-//   reset
-//---------------------------------------------------------
-
-void Fingering::reset()
-      {
-      Text::reset();
-      }
-
-//---------------------------------------------------------
-//   subtypeName
-//---------------------------------------------------------
-
-QString Fingering::subtypeName() const
-      {
-      return subStyleName(subStyle());
       }
 
 }

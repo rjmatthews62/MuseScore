@@ -326,7 +326,7 @@ static void processBasicDrawObj(QList<BasicDrawObj*> objects, Segment* s, int tr
                                     break;
                                     }
                               }
-                        Text* text = new StaffText(score);
+                        TextBase* text = new StaffText(score);
                         QFont f(st->font());
                         text->setFamily(f.family());
                         text->setItalic(f.italic());
@@ -972,7 +972,7 @@ static int readCapVoice(Score* score, CapVoice* cvoice, int staffIdx, int tick, 
                         case CapellaType::TEXT: {
 
                               TextObj* to = static_cast<TextObj*>(o);
-                              Text* s = new Text(SubStyle::TITLE, score);
+                              Text* s = new Text(score, Tid::TITLE);
                               QString ss = ::rtf2html(QString(to->text));
 
                               // qDebug("string %f:%f w %d ratio %d <%s>",
@@ -1126,12 +1126,12 @@ void convertCapella(Score* score, Capella* cap, bool capxMode)
       if (cap->systems.isEmpty())
             return;
 
-      score->style().set(StyleIdx::measureSpacing, 1.0);
+      score->style().set(Sid::measureSpacing, 1.0);
       score->setSpatium(cap->normalLineDist * DPMM);
-      score->style().set(StyleIdx::smallStaffMag, cap->smallLineDist / cap->normalLineDist);
-      score->style().set(StyleIdx::minSystemDistance, Spatium(8));
-      score->style().set(StyleIdx::maxSystemDistance, Spatium(12));
-      // score->style().set(StyleIdx::hideEmptyStaves, true);
+      score->style().set(Sid::smallStaffMag, cap->smallLineDist / cap->normalLineDist);
+      score->style().set(Sid::minSystemDistance, Spatium(8));
+      score->style().set(Sid::maxSystemDistance, Spatium(12));
+      // score->style().set(Sid::hideEmptyStaves, true);
 
 #if 1
       foreach(CapSystem* csys, cap->systems) {
@@ -1237,13 +1237,14 @@ void convertCapella(Score* score, Capella* cap, bool capxMode)
                   case CapellaType::SIMPLE_TEXT:
                         {
                         SimpleTextObj* to = static_cast<SimpleTextObj*>(o);
-                        Text* s = new Text(score);
+                        Tid tid;
                         switch (to->textalign()) {
-                              case 0:   s->initSubStyle(SubStyle::POET);    break;
-                              case 1:   s->initSubStyle(SubStyle::TITLE);   break;
-                              case 2:   s->initSubStyle(SubStyle::COMPOSER); break;
-                              default:                                      break;
+                              case 0:   tid = Tid::POET;    break;
+                              case 1:   tid = Tid::TITLE;   break;
+                              case 2:   tid = Tid::COMPOSER; break;
+                              default:  tid = Tid::DEFAULT; break;
                               }
+                        Text* s = new Text(score, tid);
                         QFont f(to->font());
                         s->setItalic(f.italic());
                         // s->setUnderline(f.underline());
@@ -1333,16 +1334,27 @@ void convertCapella(Score* score, Capella* cap, bool capxMode)
                               }
                         }
                   if (empty) {
-                        Segment* s = m->getSegment(SegmentType::ChordRest, m->tick());
-                        Rest* rest = new Rest(score);
-                        TDuration d(m->len());
-                        if ((m->len() == m->timesig()) || !d.isValid())
+
+                        if ((m->len() == m->timesig())) {
+                              Segment* s = m->getSegment(SegmentType::ChordRest, m->tick());
+                              Rest* rest = new Rest(score);
                               rest->setDurationType(TDuration::DurationType::V_MEASURE);
-                        else
-                              rest->setDurationType(d.type());
-                        rest->setDuration(m->len());
-                        rest->setTrack(staffIdx * VOICES);
-                        s->add(rest);
+                              rest->setDuration(m->len());
+                              rest->setTrack(staffIdx * VOICES);
+                              s->add(rest);
+                              }
+                        else {
+                              auto durList = toDurationList(m->len(), true);
+                              int tickOffset = 0;
+                              for (auto d : durList) {
+                                    Segment* s = m->getSegment(SegmentType::ChordRest, m->tick() + tickOffset);
+                                    Rest* rest = new Rest(score);
+                                    rest->setDurationType(d);
+                                    rest->setTrack(staffIdx * VOICES);
+                                    s->add(rest);
+                                    tickOffset += d.ticks();
+                                    }
+                              }
                         }
                   }
             }
@@ -1400,7 +1412,14 @@ void TextObj::read()
       {
       BasicRectObj::read();
       unsigned size = cap->readUnsigned();
+#if (!defined (_MSCVER) && !defined (_MSC_VER))
       char txt[size+1];
+#else
+      // MSVC does not support VLA. Replace with std::vector. If profiling determines that the
+      //    heap allocation is slow, an optimization might be used.
+      std::vector<char> vtxt(size+1);
+      char* txt = vtxt.data();
+#endif
       cap->read(txt, size);
       txt[size] = 0;
       text = QString(txt);
@@ -1484,7 +1503,14 @@ void MetafileObj::read()
       {
       BasicRectObj::read();
       unsigned size = cap->readUnsigned();
+#if (!defined (_MSCVER) && !defined (_MSC_VER))
       char enhMetaFileBits[size];
+#else
+      // MSVC does not support VLA. Replace with std::vector. If profiling determines that the
+      //    heap allocation is slow, an optimization might be used.
+      std::vector<char> vEnhMetaFileBits(size);
+      char* enhMetaFileBits = vEnhMetaFileBits.data();
+#endif
       cap->read(enhMetaFileBits, size);
       // qDebug("MetaFileObj::read %d bytes", size);
       }
@@ -2198,7 +2224,7 @@ void Capella::readStaveLayout(CapStaffLayout* sl, int idx)
             uchar iMin = readByte();
             Q_UNUSED(iMin);
             uchar n    = readByte();
-            Q_ASSERT (n > 0 and iMin + n <= 128);
+            Q_ASSERT (n > 0 && iMin + n <= 128);
             f->read(sl->soundMapIn, n);
             curPos += n;
             }
@@ -2206,7 +2232,7 @@ void Capella::readStaveLayout(CapStaffLayout* sl, int idx)
             unsigned char iMin = readByte();
             Q_UNUSED(iMin);
             unsigned char n    = readByte();
-            Q_ASSERT (n > 0 and iMin + n <= 128);
+            Q_ASSERT (n > 0 && iMin + n <= 128);
             f->read(sl->soundMapOut, n);
             curPos += n;
             }
@@ -2693,7 +2719,7 @@ Score::FileError importCapella(MasterScore* score, const QString& name)
             if (!MScore::noGui) {
                   QMessageBox::warning(0,
                      QWidget::tr("Import Capella"),
-                     QWidget::tr("Load failed: ") + cf.error(errNo),
+                     QWidget::tr("Load failed: %1").arg(cf.error(errNo)),
                      QString::null, QWidget::tr("Quit"), QString::null, 0, 1);
                   }
             fp.close();

@@ -37,7 +37,7 @@ class XmlWriter;
 #define STAFFTYPE_TAB_DEFAULTDOTDIST_X    0.75
 
 // TAB STEM NOTATION
-// the ratio between the length of a full stem and the lenght of a short stem
+// the ratio between the length of a full stem and the length of a short stem
 // (used for half note stems, in some TAB styles)
 #define STAFFTYPE_TAB_SHORTSTEMRATIO      0.5
 // metrics of slashes through half note stems
@@ -126,7 +126,7 @@ enum class TablatureMinimStyle : char {
 
 enum class TablatureSymbolRepeat : char {
       NEVER = 0,                    // never repeat the same duration symbol
-      SYSTEM,                       // repeat at the begining of a new system
+      SYSTEM,                       // repeat at the beginning of a new system
       MEASURE,                      // repeat at the beginning of a new measure
       ALWAYS                        // always repeat
       };
@@ -147,18 +147,21 @@ struct TablatureDurationFont {
       bool read(XmlReader&);
       };
 
-// ready-made staff types:
+// ready-made staff types
+// keep in sync with the _presets initialization in StaffType::initStaffTypes()
 
 enum class StaffTypes : signed char {
       STANDARD,
       PERC_1LINE, PERC_3LINE, PERC_5LINE,
       TAB_6SIMPLE, TAB_6COMMON, TAB_6FULL,
-            TAB_4SIMPLE, TAB_4COMMON, TAB_4FULL,
-            TAB_UKULELE, TAB_BALALAJKA, TAB_ITALIAN, TAB_FRENCH,
+      TAB_4SIMPLE, TAB_4COMMON, TAB_4FULL,
+      TAB_5SIMPLE, TAB_5COMMON, TAB_5FULL,
+      TAB_UKULELE, TAB_BALALAJKA, TAB_ITALIAN, TAB_FRENCH,
+      TAB_7COMMON, TAB_8COMMON,
       STAFF_TYPES,
-      // some usefull shorthands:
-            PERC_DEFAULT = StaffTypes::PERC_5LINE,
-            TAB_DEFAULT = StaffTypes::TAB_6COMMON
+      // some useful shorthands:
+      PERC_DEFAULT = StaffTypes::PERC_5LINE,
+      TAB_DEFAULT = StaffTypes::TAB_6COMMON,
       };
 
 static const int  STAFF_GROUP_NAME_MAX_LENGTH   = 32;
@@ -172,7 +175,7 @@ class StaffType {
 
       StaffGroup _group = StaffGroup::STANDARD;
 
-      QString _xmlName;                   // the name used to reference this preset in intruments.xml
+      QString _xmlName;                   // the name used to reference this preset in instruments.xml
       QString _name;                      // user visible name
 
       qreal _userMag           { 1.0   };       // allowed 0.1 - 10.0
@@ -319,7 +322,7 @@ class StaffType {
       QString fretString(int fret, int string, bool ghost) const;   // returns a string with the text for fret
       QString durationString(TDuration::DurationType type, int dots) const;
 
-      // functions to cope with historic TAB's pecularities, like upside-down, bass string notations
+      // functions to cope with historic TAB's peculiarities, like upside-down, bass string notations
       int     physStringToVisual(int strg) const;                 // return the string in visual order from physical string
       int     visualStringToPhys(int line) const;                 // return the string in physical order from visual string
       qreal   physStringToYOffset(int strg) const;                // return the string Y offset (in sp, chord-relative)
@@ -414,7 +417,7 @@ enum class TabBeamGrid : char {
       NUM_OF
       };
 
-class TabDurationSymbol : public Element {
+class TabDurationSymbol final : public Element {
       qreal       _beamLength;      // if _grid==MEDIALFINAL, length of the beam toward previous grid element
       int         _beamLevel;       // if _grid==MEDIALFINAL, the number of beams
       TabBeamGrid _beamGrid;        // value for special 'English' grid display

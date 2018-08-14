@@ -149,7 +149,6 @@
           <voice>1</voice>
           <name>Pedal Hi-Hat</name>
           <stem>2</stem>
-          <shortcut>F</shortcut>
           </Drum>
         <Drum pitch="45">
           <head>normal</head>
@@ -617,6 +616,7 @@
           <duration>4/4</duration>
           </Rest>
         <BarLine>
+          <subtype>end</subtype>
           <span>1</span>
           </BarLine>
         <move>0/1</move>
@@ -1016,6 +1016,7 @@
           <duration>4/4</duration>
           </Rest>
         <BarLine>
+          <subtype>end</subtype>
           <span>1</span>
           </BarLine>
         <move>0/1</move>

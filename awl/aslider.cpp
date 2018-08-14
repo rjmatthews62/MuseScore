@@ -41,6 +41,8 @@ AbstractSlider::AbstractSlider(QWidget* parent)
       _scaleWidth = 4;
       _log        = false;
       _useActualValue = false;
+      _dclickValue1 = 0.0;
+      _dclickValue2 = 0.0;
       setFocusPolicy(Qt::StrongFocus);
       }
 
@@ -300,7 +302,8 @@ QString AccessibleAbstractSlider::text(QAccessible::Text t) const
             default:
                   return QString();
             }
-      return QString();
+      // Eliminate "unreachable code" 
+      // return QString();
       }
 
 void AccessibleAbstractSlider::valueChanged(double, int)

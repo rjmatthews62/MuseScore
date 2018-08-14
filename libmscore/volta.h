@@ -29,23 +29,15 @@ extern LineSegment* voltaDebug;
 //   @@ VoltaSegment
 //---------------------------------------------------------
 
-class VoltaSegment : public TextLineBaseSegment {
-      Q_GADGET
-
+class VoltaSegment final : public TextLineBaseSegment {
    public:
-      VoltaSegment(Score* s) : TextLineBaseSegment(s) {}
-      virtual ElementType type() const override   { return ElementType::VOLTA_SEGMENT; }
+      VoltaSegment(Score* s) : TextLineBaseSegment(s, ElementFlag::MOVABLE | ElementFlag::ON_STAFF) {}
+      virtual ElementType type() const override     { return ElementType::VOLTA_SEGMENT; }
       virtual VoltaSegment* clone() const override  { return new VoltaSegment(*this); }
       Volta* volta() const                          { return (Volta*)spanner(); }
       virtual void layout() override;
 
-      virtual QVariant getProperty(P_ID propertyId) const override;
-      virtual bool setProperty(P_ID propertyId, const QVariant&) override;
-      virtual QVariant propertyDefault(P_ID) const override;
-      virtual PropertyFlags propertyFlags(P_ID) const override;
-      virtual StyleIdx getPropertyStyle(P_ID) const override;
-      virtual void resetProperty(P_ID id) override;
-      virtual void styleChanged() override;
+      virtual Element* propertyDelegate(Pid) override;
       };
 
 //---------------------------------------------------------
@@ -53,9 +45,7 @@ class VoltaSegment : public TextLineBaseSegment {
 //   @P voltaType  enum (Volta.CLOSE, Volta.OPEN)
 //---------------------------------------------------------
 
-class Volta : public TextLineBase {
-      Q_GADGET
-
+class Volta final : public TextLineBase {
       QList<int> _endings;
 
    public:
@@ -65,7 +55,7 @@ class Volta : public TextLineBase {
 
       Volta(Score* s);
       virtual Volta* clone()       const override { return new Volta(*this); }
-      virtual ElementType type() const override { return ElementType::VOLTA; }
+      virtual ElementType type() const override   { return ElementType::VOLTA; }
       virtual LineSegment* createLineSegment() override;
 
       virtual void write(XmlWriter&) const override;
@@ -78,15 +68,14 @@ class Volta : public TextLineBase {
       QString text() const;
 
       bool hasEnding(int repeat) const;
+      int lastEnding() const;
       void setVoltaType(Volta::Type);     // deprecated
       Type voltaType() const;             // deprecated
 
-      virtual QVariant getProperty(P_ID propertyId) const override;
-      virtual bool setProperty(P_ID propertyId, const QVariant&) override;
-      virtual QVariant propertyDefault(P_ID) const override;
-      virtual StyleIdx getPropertyStyle(P_ID) const override;
+      virtual QVariant getProperty(Pid propertyId) const override;
+      virtual bool setProperty(Pid propertyId, const QVariant&) override;
+      virtual QVariant propertyDefault(Pid) const override;
 
-      virtual bool systemFlag() const override  { return true;  }
       virtual QString accessibleInfo() const override;
       };
 

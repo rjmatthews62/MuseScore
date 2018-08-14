@@ -21,6 +21,7 @@
 #include "config.h"
 #include "icons.h"
 #include "instrwidget.h"
+#include "stringutils.h"
 
 #include "libmscore/clef.h"
 #include "libmscore/instrtemplate.h"
@@ -54,9 +55,14 @@ void filterInstruments(QTreeWidget* instrumentList, const QString &searchPhrase)
             QTreeWidgetItem* ci = 0;
 
             for (int cidx = 0; (ci = item->child(cidx)); ++cidx) {
-                  // replace the unicode b (accidential) so a search phrase of "bb" would give Bb Trumpet...
+                  // replace the unicode b (accidental) so a search phrase of "bb" would give Bb Trumpet...
                   QString text = ci->text(0).replace(QChar(0x266d), QChar('b'));
-                  bool isMatch = text.contains(searchPhrase, Qt::CaseInsensitive);
+
+                  // remove ligatures and diacritics
+                  QString removedSpecialChar = stringutils::removeLigatures(text);
+                  removedSpecialChar = stringutils::removeDiacritics(removedSpecialChar);
+
+                  bool isMatch = text.contains(searchPhrase, Qt::CaseInsensitive) || removedSpecialChar.contains(searchPhrase, Qt::CaseInsensitive);
                   ci->setHidden(!isMatch);
 
                   if (isMatch)
@@ -106,6 +112,7 @@ void StaffListItem::initStaffTypeCombo(bool forceRecreate)
       // or a memory leak may result
 
       bool canUseTabs = false; // assume only normal staves are applicable
+      int numFrettedStrings = 0;
       bool canUsePerc = false;
       PartListItem* part = static_cast<PartListItem*>(QTreeWidgetItem::parent());
 
@@ -114,7 +121,9 @@ void StaffListItem::initStaffTypeCombo(bool forceRecreate)
       if (part) {
             const StringData* stringData = part->it ? &(part->it->stringData) :
                         ( (part->part && part->part->instrument()) ? part->part->instrument()->stringData() : 0);
-            canUseTabs = stringData && stringData->strings() > 0;
+            canUseTabs = stringData && stringData->frettedStrings() > 0;
+            if (canUseTabs)
+                  numFrettedStrings = stringData->frettedStrings();
             canUsePerc = part->it ? part->it->useDrumset :
                         ( (part->part && part->part->instrument()) ? part->part->instrument()->useDrumset() : false);
             }
@@ -124,7 +133,7 @@ void StaffListItem::initStaffTypeCombo(bool forceRecreate)
       for (const StaffType& st : StaffType::presets()) {
             if ( (st.group() == StaffGroup::STANDARD && (!canUsePerc))    // percussion excludes standard
                         || (st.group() == StaffGroup::PERCUSSION && canUsePerc)
-                        || (st.group() == StaffGroup::TAB && canUseTabs)) {
+                        || (st.group() == StaffGroup::TAB && canUseTabs && st.lines() <= numFrettedStrings)) {
                   _staffTypeCombo->addItem(st.name(), idx);
                   }
             ++idx;
@@ -404,7 +413,7 @@ void populateGenreCombo(QComboBox* combo)
 void populateInstrumentList(QTreeWidget* instrumentList)
       {
       instrumentList->clear();
-      // TODO: memory leak
+      // TODO: memory leak?
       foreach(InstrumentGroup* g, instrumentGroups) {
             InstrumentTemplateListItem* group = new InstrumentTemplateListItem(g->name, instrumentList);
             group->setFlags(Qt::ItemIsEnabled);
@@ -422,7 +431,6 @@ void InstrumentsWidget::buildTemplateList()
       {
       // clear search if instrument list is updated
       search->clear();
-      filterInstruments(instrumentList, search->text());
 
       populateInstrumentList(instrumentList);
       populateGenreCombo(instrumentGenreFilter);
@@ -457,10 +465,11 @@ void InstrumentsWidget::genPartList(Score* cs)
                   sli->setClefType(s->clefType(0));
                   sli->setDefaultClefType(s->defaultClefType());
                   sli->setPartIdx(s->rstaff());
-                  const LinkedStaves* ls = s->linkedStaves();
+                  const LinkedElements* ls = s->links();
                   bool bLinked = false;
                   if (ls && !ls->empty()) {
-                        foreach(Staff* ps, ls->staves()) {
+                        for (auto le : *ls) {
+                              Staff* ps = toStaff(le);
                               if (ps != s && ps->score() == s->score()) {
                                     bLinked = true;
                                     break;
@@ -671,7 +680,13 @@ void InstrumentsWidget::on_upButton_clicked()
                   // Qt looses the QComboBox set into StaffListItem's when they are re-inserted into the tree:
                   // get the currently selected staff type of each combo and re-insert
                   int numOfStaffListItems = item->childCount();
+#if (!defined (_MSCVER) && !defined (_MSC_VER))
                   int staffIdx[numOfStaffListItems];
+#else
+                  // MSVC does not support VLA. Replace with std::vector. If profiling determines that the
+                  //    heap allocation is slow, an optimization might be used.
+                  std::vector<int> staffIdx(numOfStaffListItems);
+#endif
                   for (int itemIdx=0; itemIdx < numOfStaffListItems; ++itemIdx)
                         staffIdx[itemIdx] = (static_cast<StaffListItem*>(item->child(itemIdx)))->staffTypeIdx();
                   // do not consider hidden ones
@@ -754,7 +769,13 @@ void InstrumentsWidget::on_downButton_clicked()
                   // Qt looses the QComboBox set into StaffListItem's when they are re-inserted into the tree:
                   // get the currently selected staff type of each combo and re-insert
                   int numOfStaffListItems = item->childCount();
+#if (!defined (_MSCVER) && !defined (_MSC_VER))
                   int staffIdx[numOfStaffListItems];
+#else
+                  // MSVC does not support VLA. Replace with std::vector. If profiling determines that the
+                  //    heap allocation is slow, an optimization might be used.
+                  std::vector<int> staffIdx(numOfStaffListItems);
+#endif
                   int itemIdx;
                   for (itemIdx=0; itemIdx < numOfStaffListItems; ++itemIdx)
                         staffIdx[itemIdx] = (static_cast<StaffListItem*>(item->child(itemIdx)))->staffTypeIdx();
@@ -875,25 +896,12 @@ void InstrumentsWidget::on_linkedButton_clicked()
 
 void InstrumentsWidget::on_search_textChanged(const QString &searchPhrase)
       {
-      if (searchPhrase.isEmpty())
-            return;
-
-      filterInstruments(instrumentList, searchPhrase);
       instrumentGenreFilter->blockSignals(true);
       instrumentGenreFilter->setCurrentIndex(0);
       instrumentGenreFilter->blockSignals(false);
+      filterInstruments(instrumentList, searchPhrase);
       }
 
-//---------------------------------------------------------
-//   on_clearSearch_clicked
-//---------------------------------------------------------
-
-void InstrumentsWidget::on_clearSearch_clicked()
-      {
-      search->clear();
-      QString genre = instrumentGenreFilter->currentData().toString();
-      filterInstrumentsByGenre(instrumentList, genre);
-      }
 
 //---------------------------------------------------------
 //   on_instrumentGenreFilter_currentTextChanged

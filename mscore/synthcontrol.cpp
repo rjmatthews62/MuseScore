@@ -206,6 +206,16 @@ void SynthControl::setMeter(float l, float r, float left_peak, float right_peak)
       }
 
 //---------------------------------------------------------
+//   setScore
+//---------------------------------------------------------
+void SynthControl::setScore(Score* s) {
+      _score = s;
+
+      loadButton->setEnabled(true);
+      saveButton->setEnabled(true);
+      }
+
+//---------------------------------------------------------
 //   stop
 //---------------------------------------------------------
 
@@ -291,7 +301,7 @@ void SynthControl::recallButtonClicked()
             qDebug("cannot read synthesizer settings <%s>", qPrintable(s));
             return;
             }
-      XmlReader e(0, &f);
+      XmlReader e(&f);
       while (e.readNextStartElement()) {
             if (e.name() == "Synthesizer")
                   state.read(e);
@@ -320,16 +330,7 @@ void SynthControl::storeButtonClicked()
             qDebug("no score");
             return;
             }
-      QString s(dataPath + "/synthesizer.xml");
-      QFile f(s);
-      if (!f.open(QIODevice::WriteOnly)) {
-            qDebug("cannot write synthesizer settings <%s>", qPrintable(s));
-            return;
-            }
-      XmlWriter xml(0, &f);
-      xml.header();
-      synti->state().write(xml);
-
+      synti->storeState();
       storeButton->setEnabled(false);
       recallButton->setEnabled(false);
       }

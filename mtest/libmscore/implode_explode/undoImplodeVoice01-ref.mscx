@@ -96,7 +96,6 @@
           <actualNotes>3</actualNotes>
           <baseNote>quarter</baseNote>
           <Number>
-            <style>Tuplet</style>
             <text>3</text>
             </Number>
           </Tuplet>
@@ -263,6 +262,7 @@
           <durationType>half</durationType>
           </Rest>
         <BarLine>
+          <subtype>end</subtype>
           <span>1</span>
           </BarLine>
         </Measure>

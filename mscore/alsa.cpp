@@ -190,7 +190,7 @@ snd_pcm_sframes_t AlsaDriver::pcmWait()
                   snd_pcm_poll_descriptors(_play_handle, _pfd, _play_npfd);
 
             errno = 0;
-            // timout in ms or infinite
+            // timeout in ms or infinite
             if (poll(_pfd, _play_npfd, -1) < 0) {
                   if (errno == EINTR) {
                         _stat = 1;
@@ -258,11 +258,15 @@ int AlsaDriver::playInit(snd_pcm_uframes_t len)
 
 void AlsaDriver::printinfo()
       {
-      qDebug("\n  nchan  : %d", _play_nchan);
+      qDebug("Info:");
+      qDebug("  nchan  : %d", _play_nchan);
       qDebug("  rate   : %d", _rate);
       qDebug("  frsize : %ld", _frsize);
       qDebug("  nfrags : %d", _nfrags);
-      qDebug("  format : %s", snd_pcm_format_name (_play_format));
+
+      snd_pcm_format_t format;
+      snd_pcm_hw_params_get_format (_play_hwpar, &format);
+      qDebug("  format : %s", snd_pcm_format_name (format));
       }
 
 //---------------------------------------------------------
@@ -342,7 +346,8 @@ bool AlsaDriver::setHwpar(snd_pcm_t* handle, snd_pcm_hw_params_t* hwpar)
             }
 
       if ((err = snd_pcm_hw_params (handle, hwpar)) < 0) {
-            qDebug("Alsa_driver: can't set hardware parameters.");
+            qDebug("Alsa_driver: can't set hardware parameters: %s", snd_strerror(err));
+            printinfo();
             return false;
             }
       return true;
@@ -602,7 +607,7 @@ int AlsaAudio::sampleRate() const
       if (alsa)
             return alsa->sampleRate();
       else
-            return preferences.alsaSampleRate;
+            return preferences.getInt(PREF_IO_ALSA_SAMPLERATE);
       }
 
 //---------------------------------------------------------
@@ -623,10 +628,10 @@ AlsaAudio::~AlsaAudio()
 bool AlsaAudio::init(bool /*hot*/)
       {
       alsa = new AlsaDriver(
-         preferences.alsaDevice,
-         preferences.alsaSampleRate,
-         preferences.alsaPeriodSize,
-         preferences.alsaFragments);
+         preferences.getString(PREF_IO_ALSA_DEVICE),
+         preferences.getInt(PREF_IO_ALSA_SAMPLERATE),
+         preferences.getInt(PREF_IO_ALSA_PERIODSIZE),
+         preferences.getInt(PREF_IO_ALSA_FRAGMENTS));
       if (!alsa->init()) {
             delete alsa;
             alsa = 0;
@@ -660,7 +665,7 @@ static void* alsaLoop(void* alsa)
 void AlsaAudio::alsaLoop()
       {
       //
-      // try to get realtime priviledges
+      // try to get realtime privileges
       //
       struct sched_param rt_param;
       memset(&rt_param, 0, sizeof(rt_param));

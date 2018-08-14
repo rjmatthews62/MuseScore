@@ -22,7 +22,7 @@ namespace Ms {
 ///    a single segment of slur; also used for Tie
 //---------------------------------------------------------
 
-class SlurSegment : public SlurTieSegment {
+class SlurSegment final : public SlurTieSegment {
 
    protected:
       virtual void changeAnchor(EditData&, Element*);
@@ -32,7 +32,7 @@ class SlurSegment : public SlurTieSegment {
       SlurSegment(const SlurSegment& ss) : SlurTieSegment(ss) {}
 
       virtual SlurSegment* clone() const override  { return new SlurSegment(*this); }
-      virtual ElementType type() const override  { return ElementType::SLUR_SEGMENT; }
+      virtual ElementType type() const override    { return ElementType::SLUR_SEGMENT; }
       virtual int subtype() const override         { return static_cast<int>(spanner()->type()); }
       virtual QString subtypeName() const override { return name(spanner()->type()); }
       virtual void draw(QPainter*) const override;
@@ -52,7 +52,7 @@ class SlurSegment : public SlurTieSegment {
 //   @@ Slur
 //---------------------------------------------------------
 
-class Slur : public SlurTie {
+class Slur final : public SlurTie {
 
       void slurPosChord(SlurPos*);
 

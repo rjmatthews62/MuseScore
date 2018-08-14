@@ -24,7 +24,7 @@ namespace Awl {
 
 //---------------------------------------------------------
 //   Knob
-///   this is the AwlKnob contructor
+///   this is the AwlKnob constructor
 //---------------------------------------------------------
 
 Knob::Knob(QWidget* parent)
@@ -261,11 +261,11 @@ void Knob::paintEvent(QPaintEvent* /*ev*/)
       if (_center) {
             if (points)
                   delete points;
-            qreal x = ar.width() / 2 + ar.x();
-            qreal y = ar.y() - _markSize - _scaleWidth/2;
-            points = new QPainterPath(QPointF(x - markSize2, y));
-            points->lineTo(x + markSize2, y);
-            points->lineTo(x, _markSize + y);
+            qreal x3 = ar.width() / 2 + ar.x();
+            qreal y3 = ar.y() - _markSize - _scaleWidth/2;
+            points = new QPainterPath(QPointF(x3 - markSize2, y3));
+            points->lineTo(x3 + markSize2, y3);
+            points->lineTo(x3, _markSize + y3);
             points->closeSubpath();
             p.drawPath(*points);
             }

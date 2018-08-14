@@ -388,7 +388,7 @@ Note* prevChordNote(Note* note)
 
 //---------------------------------------------------------
 //   pitchKeyAdjust
-//    change entered note to sounding pitch dependend
+//    change entered note to sounding pitch dependent
 //    on key.
 //    Example: if F is entered in G-major, a Fis is played
 //    key -7 ... +7
@@ -508,7 +508,7 @@ QString pitch2string(int v)
       {
       if (v < 0 || v > 127)
             return QString("----");
-      int octave = (v / 12) - 2;
+      int octave = (v / 12) - 1;
       QString o;
       o.sprintf("%d", octave);
       int i = v % 12;
@@ -670,6 +670,34 @@ int updateVersion()
       }
 
 //---------------------------------------------------------
+//   updateVersion
+///  Up to 4 digits X.X.X.X
+///  Each digit can be double XX.XX.XX.XX
+///  return true if v1 < v2
+//---------------------------------------------------------
+
+bool compareVersion(QString v1, QString v2)
+      {
+      auto v1l = v1.split(".");
+      auto v2l = v2.split(".");
+      int ma = qPow(100,qMax(v1l.size(), v2l.size()));
+      int m = ma;
+      int vv1 = 0;
+      for (int i = 0; i < v1l.size(); i++) {
+            vv1 += (m * v1l[i].toInt());
+            m /= 100;
+            }
+      m = ma;
+      int vv2 = 0;
+      for (int i = 0; i < v2l.size(); i++) {
+            vv2 += (m * v2l[i].toInt());
+            m /= 100;
+            }
+
+      return vv1 < vv2;
+      }
+
+//---------------------------------------------------------
 //   diatonicUpDown
 //    used to find the second note of a trill, mordent etc.
 //    key  -7 ... +7
@@ -771,9 +799,22 @@ Note* searchTieNote(Note* note)
       int etrack   = strack + part->staves()->size() * VOICES;
 
       if (chord->isGraceBefore()) {
-            // grace before
-            // try to tie to note in parent chord
             chord = toChord(chord->parent());
+
+            // try to tie to next grace note
+
+            int index = chord->graceIndex();
+            for (Chord* c : chord->graceNotes()) {
+                  if (c->graceIndex() == index + 1) {
+                        note2 = c->findNote(note->pitch());
+                        if (note2) {
+                              printf("found grace-grace tie\n");
+                              return note2;
+                              }
+                        }
+                  }
+
+            // try to tie to note in parent chord
             note2 = chord->findNote(note->pitch());
             if (note2)
                   return note2;

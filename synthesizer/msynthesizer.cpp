@@ -45,14 +45,17 @@ void MasterSynthesizer::init()
             setState(defaultState);
             return;
             }
-      XmlReader e(0, &f);
+      XmlReader e(&f);
       while (e.readNextStartElement()) {
             if (e.name() == "Synthesizer")
                   state.read(e);
             else
                   e.unknown();
             }
-      setState(state);
+      if (!setState(state)) {
+            f.remove();
+            setState(defaultState);
+            }
       }
 
 //---------------------------------------------------------
@@ -196,8 +199,12 @@ void MasterSynthesizer::setEffect(int ab, int idx)
             return;
             }
       lock2 = true;
-      while (lock1)
-            sleep(1);
+      while(lock1)
+#if (!defined (_MSCVER) && !defined (_MSC_VER))
+         sleep(1);
+#else
+         Sleep(1000);      // MS-equivalent function, time in ms instead of seconds.
+#endif
       _effect[ab] = _effectList[ab][idx];
       lock2 = false;
       }
@@ -362,6 +369,24 @@ SynthesizerState MasterSynthesizer::state() const
       if (_effect[1])
             ss.push_back(_effect[1]->state());
       return ss;
+      }
+
+//---------------------------------------------------------
+//   storeState
+//---------------------------------------------------------
+
+bool MasterSynthesizer::storeState()
+      {
+      QString s(dataPath + "/synthesizer.xml");
+      QFile f(s);
+      if (!f.open(QIODevice::WriteOnly)) {
+            qDebug("cannot write synthesizer settings <%s>", qPrintable(s));
+            return false;
+            }
+      XmlWriter xml(0, &f);
+      xml.header();
+      state().write(xml);
+      return true;
       }
 
 //---------------------------------------------------------

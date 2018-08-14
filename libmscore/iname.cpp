@@ -18,15 +18,32 @@
 
 namespace Ms {
 
+static const ElementStyle longInstrumentStyle {
+      { Sid::longInstrumentFontFace,             Pid::FONT_FACE              },
+      { Sid::longInstrumentFontSize,             Pid::FONT_SIZE              },
+      { Sid::longInstrumentFontBold,             Pid::FONT_BOLD              },
+      { Sid::longInstrumentFontItalic,           Pid::FONT_ITALIC            },
+      { Sid::longInstrumentFontUnderline,        Pid::FONT_UNDERLINE         },
+      { Sid::longInstrumentAlign,                Pid::ALIGN                  },
+      };
+
+static const ElementStyle shortInstrumentStyle {
+      { Sid::shortInstrumentFontFace,            Pid::FONT_FACE              },
+      { Sid::shortInstrumentFontSize,            Pid::FONT_SIZE              },
+      { Sid::shortInstrumentFontBold,            Pid::FONT_BOLD              },
+      { Sid::shortInstrumentFontItalic,          Pid::FONT_ITALIC            },
+      { Sid::shortInstrumentFontUnderline,       Pid::FONT_UNDERLINE         },
+      { Sid::shortInstrumentAlign,               Pid::ALIGN                  },
+      };
+
 //---------------------------------------------------------
 //   InstrumentName
 //---------------------------------------------------------
 
 InstrumentName::InstrumentName(Score* s)
-   : Text(s)
+   : TextBase(s, ElementFlag::NOTHING | ElementFlag::NOT_SELECTABLE)
       {
       setInstrumentNameType(InstrumentNameType::SHORT);
-      setSelectable(false);
       }
 
 //---------------------------------------------------------
@@ -59,20 +76,20 @@ void InstrumentName::setInstrumentNameType(const QString& s)
 void InstrumentName::setInstrumentNameType(InstrumentNameType st)
       {
       _instrumentNameType = st;
-      initSubStyle(st == InstrumentNameType::SHORT ? SubStyle::INSTRUMENT_SHORT : SubStyle::INSTRUMENT_LONG);
+      initElementStyle(st == InstrumentNameType::SHORT ? &shortInstrumentStyle : &longInstrumentStyle);
       }
 
 //---------------------------------------------------------
 //   getProperty
 //---------------------------------------------------------
 
-QVariant InstrumentName::getProperty(P_ID id) const
+QVariant InstrumentName::getProperty(Pid id) const
       {
       switch (id) {
-            case P_ID::INAME_LAYOUT_POSITION:
+            case Pid::INAME_LAYOUT_POSITION:
                   return _layoutPos;
             default:
-                  return Text::getProperty(id);
+                  return TextBase::getProperty(id);
             }
       }
 
@@ -80,22 +97,24 @@ QVariant InstrumentName::getProperty(P_ID id) const
 //   setProperty
 //---------------------------------------------------------
 
-bool InstrumentName::setProperty(P_ID id, const QVariant& v)
+bool InstrumentName::setProperty(Pid id, const QVariant& v)
       {
       bool rv = true;
       switch (id) {
-            case P_ID::INAME_LAYOUT_POSITION:
+            case Pid::INAME_LAYOUT_POSITION:
                   _layoutPos = v.toInt();
                   break;
             default:
-                  rv = Text::setProperty(id, v);
+                  rv = TextBase::setProperty(id, v);
                   break;
             }
-      StyleIdx sidx = getPropertyStyle(id);
-      if (sidx != StyleIdx::NOSTYLE) {
+#if 0
+      Sid sidx = getPropertyStyle(id);
+      if (sidx != Sid::NOSTYLE) {
             score()->undoChangeStyleVal(sidx, getProperty(id));
             }
       score()->setLayoutAll();
+#endif
       return rv;
       }
 
@@ -103,13 +122,13 @@ bool InstrumentName::setProperty(P_ID id, const QVariant& v)
 //   propertyDefault
 //---------------------------------------------------------
 
-QVariant InstrumentName::propertyDefault(P_ID id) const
+QVariant InstrumentName::propertyDefault(Pid id) const
       {
       switch (id) {
-            case P_ID::INAME_LAYOUT_POSITION:
+            case Pid::INAME_LAYOUT_POSITION:
                   return 0;
             default:
-                  return Text::propertyDefault(id);
+                  return TextBase::propertyDefault(id);
             }
       }
 

@@ -5,6 +5,7 @@
     <currentLayer>0</currentLayer>
     <Division>480</Division>
     <Style>
+      <ArpeggioHiddenInStdIfTab>1</ArpeggioHiddenInStdIfTab>
       <Spatium>1.76389</Spatium>
       </Style>
     <showInvisible>1</showInvisible>
@@ -72,18 +73,9 @@
           <velocity>80</velocity>
           <lid>4</lid>
           </Dynamic>
-        <Pedal id="2">
-          <endHookType>1</endHookType>
-          <endHookHeight>1</endHookHeight>
-          <beginText>let ring</beginText>
-          <beginFontItalic>1</beginFontItalic>
-          <beginTextOffset x="0" y="0"/>
-          <continueText>let ring</continueText>
-          <continueFontItalic>1</continueFontItalic>
+        <LetRing id="2">
           <lid>14</lid>
-          <placement>above</placement>
-          <lineStyle>2</lineStyle>
-          </Pedal>
+          </LetRing>
         <Chord>
           <lid>5</lid>
           <durationType>quarter</durationType>
@@ -136,7 +128,7 @@
       <currentLayer>0</currentLayer>
       <Division>480</Division>
       <Style>
-        <createMultiMeasureRests>1</createMultiMeasureRests>
+        <ArpeggioHiddenInStdIfTab>1</ArpeggioHiddenInStdIfTab>
         <Spatium>1.76389</Spatium>
         </Style>
       <showInvisible>1</showInvisible>
@@ -223,18 +215,9 @@
             <velocity>80</velocity>
             <lid>4</lid>
             </Dynamic>
-          <Pedal id="3">
-            <endHookType>1</endHookType>
-            <endHookHeight>1</endHookHeight>
-            <beginText>let ring</beginText>
-            <beginFontItalic>1</beginFontItalic>
-            <beginTextOffset x="0" y="0"/>
-            <continueText>let ring</continueText>
-            <continueFontItalic>1</continueFontItalic>
+          <LetRing id="3">
             <lid>14</lid>
-            <placement>above</placement>
-            <lineStyle>2</lineStyle>
-            </Pedal>
+            </LetRing>
           <Chord>
             <lid>5</lid>
             <durationType>quarter</durationType>
@@ -288,18 +271,9 @@
             <lid>2</lid>
             <accidental>0</accidental>
             </KeySig>
-          <Pedal id="4">
-            <endHookType>1</endHookType>
-            <endHookHeight>1</endHookHeight>
-            <beginText>let ring</beginText>
-            <beginFontItalic>1</beginFontItalic>
-            <beginTextOffset x="0" y="0"/>
-            <continueText>let ring</continueText>
-            <continueFontItalic>1</continueFontItalic>
+          <LetRing id="4">
             <lid>14</lid>
-            <placement>above</placement>
-            <lineStyle>2</lineStyle>
-            </Pedal>
+            </LetRing>
           <Chord>
             <lid>5</lid>
             <durationType>quarter</durationType>

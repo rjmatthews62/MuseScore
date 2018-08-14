@@ -18,11 +18,36 @@
 namespace Ms {
 
 //---------------------------------------------------------
+//   textLineStyle
+//---------------------------------------------------------
+
+static const ElementStyle textLineStyle {
+      { Sid::textLineFontFace,                   Pid::BEGIN_FONT_FACE         },
+      { Sid::textLineFontFace,                   Pid::CONTINUE_FONT_FACE      },
+      { Sid::textLineFontFace,                   Pid::END_FONT_FACE           },
+      { Sid::textLineFontSize,                   Pid::BEGIN_FONT_SIZE         },
+      { Sid::textLineFontSize,                   Pid::CONTINUE_FONT_SIZE      },
+      { Sid::textLineFontSize,                   Pid::END_FONT_SIZE           },
+      { Sid::textLineFontBold,                   Pid::BEGIN_FONT_BOLD         },
+      { Sid::textLineFontBold,                   Pid::CONTINUE_FONT_BOLD      },
+      { Sid::textLineFontBold,                   Pid::END_FONT_BOLD           },
+      { Sid::textLineFontItalic,                 Pid::BEGIN_FONT_ITALIC       },
+      { Sid::textLineFontItalic,                 Pid::CONTINUE_FONT_ITALIC    },
+      { Sid::textLineFontItalic,                 Pid::END_FONT_ITALIC         },
+      { Sid::textLineFontUnderline,              Pid::BEGIN_FONT_UNDERLINE    },
+      { Sid::textLineFontUnderline,              Pid::CONTINUE_FONT_UNDERLINE },
+      { Sid::textLineFontUnderline,              Pid::END_FONT_UNDERLINE      },
+      { Sid::textLineTextAlign,                  Pid::BEGIN_TEXT_ALIGN        },
+      { Sid::textLineTextAlign,                  Pid::CONTINUE_TEXT_ALIGN     },
+      { Sid::textLineTextAlign,                  Pid::END_TEXT_ALIGN          },
+      };
+
+//---------------------------------------------------------
 //   TextLineSegment
 //---------------------------------------------------------
 
 TextLineSegment::TextLineSegment(Score* s)
-   : TextLineBaseSegment(s)
+   : TextLineBaseSegment(s, ElementFlag::MOVABLE | ElementFlag::ON_STAFF)
       {
       setPlacement(Placement::ABOVE);
       }
@@ -40,10 +65,10 @@ void TextLineSegment::layout()
       if (parent()) {
             if (textLine()->placeBelow()) {
                   qreal sh = staff() ? staff()->height() : 0.0;
-                  rypos() = sh + score()->styleP(StyleIdx::textLinePosBelow) * mag();
+                  rypos() = sh + score()->styleP(Sid::textLinePosBelow) * mag();
                   }
             else
-                  rypos() = score()->styleP(StyleIdx::textLinePosAbove) * mag();
+                  rypos() = score()->styleP(Sid::textLinePosAbove) * mag();
             if (autoplace()) {
                   qreal minDistance = spatium() * .7;
                   Shape s1 = shape().translated(pos());
@@ -58,90 +83,7 @@ void TextLineSegment::layout()
                               rUserYoffset() = d + minDistance;
                         }
                   }
-            else
-                  adjustReadPos();
             }
-      }
-
-//---------------------------------------------------------
-//   getProperty
-//---------------------------------------------------------
-
-QVariant TextLineSegment::getProperty(P_ID id) const
-      {
-      switch (id) {
-            case P_ID::PLACEMENT:
-                  return textLine()->getProperty(id);
-            default:
-                  return TextLineBaseSegment::getProperty(id);
-            }
-      }
-
-//---------------------------------------------------------
-//   setProperty
-//---------------------------------------------------------
-
-bool TextLineSegment::setProperty(P_ID id, const QVariant& v)
-      {
-      switch (id) {
-            case P_ID::PLACEMENT:
-                  return textLine()->setProperty(id, v);
-            default:
-                  return TextLineBaseSegment::setProperty(id, v);
-            }
-      }
-
-//---------------------------------------------------------
-//   propertyDefault
-//---------------------------------------------------------
-
-QVariant TextLineSegment::propertyDefault(P_ID id) const
-      {
-      switch (id) {
-            case P_ID::PLACEMENT:
-                  return textLine()->propertyDefault(id);
-            default:
-                  return TextLineBaseSegment::propertyDefault(id);
-            }
-      }
-
-//---------------------------------------------------------
-//   propertyStyle
-//---------------------------------------------------------
-
-PropertyFlags TextLineSegment::propertyFlags(P_ID id) const
-      {
-      switch (id) {
-            case P_ID::PLACEMENT:
-                  return textLine()->propertyFlags(id);
-
-            default:
-                  return TextLineBaseSegment::propertyFlags(id);
-            }
-      }
-
-//---------------------------------------------------------
-//   resetProperty
-//---------------------------------------------------------
-
-void TextLineSegment::resetProperty(P_ID id)
-      {
-      switch (id) {
-            case P_ID::PLACEMENT:
-                  return textLine()->resetProperty(id);
-
-            default:
-                  return TextLineBaseSegment::resetProperty(id);
-            }
-      }
-
-//---------------------------------------------------------
-//   styleChanged
-//---------------------------------------------------------
-
-void TextLineSegment::styleChanged()
-      {
-      textLine()->styleChanged();
       }
 
 //---------------------------------------------------------
@@ -151,32 +93,30 @@ void TextLineSegment::styleChanged()
 TextLine::TextLine(Score* s)
    : TextLineBase(s)
       {
+      initElementStyle(&textLineStyle);
+
       setPlacement(Placement::ABOVE);
+      setBeginText("");
+      setContinueText("");
+      setEndText("");
+      setBeginTextOffset(QPointF(0,0));
+      setContinueTextOffset(QPointF(0,0));
+      setEndTextOffset(QPointF(0,0));
+      setLineVisible(true);
+
+      setBeginHookType(HookType::NONE);
+      setEndHookType(HookType::NONE);
+      setBeginHookHeight(Spatium(1.5));
+      setEndHookHeight(Spatium(1.5));
+
+      resetProperty(Pid::BEGIN_TEXT_PLACE);
+      resetProperty(Pid::CONTINUE_TEXT_PLACE);
+      resetProperty(Pid::END_TEXT_PLACE);
       }
 
 TextLine::TextLine(const TextLine& tl)
    : TextLineBase(tl)
       {
-      }
-
-//---------------------------------------------------------
-//   styleChanged
-//    reset all styled values to actual style
-//---------------------------------------------------------
-
-void TextLine::styleChanged()
-      {
-      TextLineBase::styleChanged();
-      triggerLayout();
-      }
-
-//---------------------------------------------------------
-//   reset
-//---------------------------------------------------------
-
-void TextLine::reset()
-      {
-      TextLineBase::reset();
       }
 
 //---------------------------------------------------------
@@ -193,52 +133,34 @@ LineSegment* TextLine::createLineSegment()
       }
 
 //---------------------------------------------------------
-//   getProperty
-//---------------------------------------------------------
-
-QVariant TextLine::getProperty(P_ID propertyId) const
-      {
-      switch (propertyId) {
-            default:
-                  break;
-            }
-      return TextLineBase::getProperty(propertyId);
-      }
-
-//---------------------------------------------------------
-//   setProperty
-//---------------------------------------------------------
-
-bool TextLine::setProperty(P_ID propertyId, const QVariant& val)
-      {
-      switch (propertyId) {
-            case P_ID::PLACEMENT:
-                  if (val != getProperty(propertyId)) {
-                        // reverse hooks
-                        setBeginHookHeight(-beginHookHeight());
-                        setEndHookHeight(-endHookHeight());
-                        }
-                  TextLineBase::setProperty(propertyId, val);
-                  break;
-
-            default:
-                  if (!TextLineBase::setProperty(propertyId, val))
-                        return false;
-                  break;
-            }
-      score()->setLayoutAll();
-      return true;
-      }
-
-//---------------------------------------------------------
 //   propertyDefault
 //---------------------------------------------------------
 
-QVariant TextLine::propertyDefault(P_ID propertyId) const
+QVariant TextLine::propertyDefault(Pid propertyId) const
       {
       switch (propertyId) {
-            case P_ID::PLACEMENT:
+            case Pid::PLACEMENT:
                   return int(Placement::ABOVE);
+            case Pid::BEGIN_TEXT:
+            case Pid::CONTINUE_TEXT:
+            case Pid::END_TEXT:
+                  return "";
+            case Pid::LINE_VISIBLE:
+                  return true;
+            case Pid::BEGIN_TEXT_OFFSET:
+            case Pid::CONTINUE_TEXT_OFFSET:
+            case Pid::END_TEXT_OFFSET:
+                  return QPointF(0,0);
+            case Pid::BEGIN_HOOK_TYPE:
+            case Pid::END_HOOK_TYPE:
+                  return int(HookType::NONE);
+            case Pid::BEGIN_TEXT_PLACE:
+            case Pid::CONTINUE_TEXT_PLACE:
+            case Pid::END_TEXT_PLACE:
+                  return int(PlaceText::LEFT);
+            case Pid::BEGIN_HOOK_HEIGHT:
+            case Pid::END_HOOK_HEIGHT:
+                  return Spatium(1.5);
             default:
                   return TextLineBase::propertyDefault(propertyId);
             }
