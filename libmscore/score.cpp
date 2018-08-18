@@ -1400,6 +1400,22 @@ void Score::removeElement(Element* element)
             if (element->isVBox() && system->measures().size() == 1) {
                   auto i = std::find(page->systems().begin(), page->systems().end(), system);
                   page->systems().erase(i);
+                  mb->setSystem(0);
+                  if (page->systems().isEmpty()) {
+                        // Remove this page, since it is now empty.
+                        // This involves renumbering and repositioning all subsequent pages.
+                        QPointF pos = page->pos();
+                        auto i = std::find(pages().begin(), pages().end(), page);
+                        pages().erase(i);
+                        while (i != pages().end()) {
+                              page = *i;
+                              page->setNo(page->no() - 1);
+                              QPointF p = page->pos();
+                              page->setPos(pos);
+                              pos = p;
+                              i++;
+                              }
+                        }
                   }
 //            setLayout(mb->tick());
             return;
@@ -3047,8 +3063,8 @@ void Score::selectSimilar(Element* e, bool sameStaff)
       score->scanElements(&pattern, collectMatch);
 
       score->select(0, SelectType::SINGLE, 0);
-      for (Element* e : pattern.el)
-            score->select(e, SelectType::ADD, 0);
+      for (Element* ee : pattern.el)
+            score->select(ee, SelectType::ADD, 0);
       }
 
 //---------------------------------------------------------
@@ -3079,8 +3095,8 @@ void Score::selectSimilarInRange(Element* e)
       score->scanElementsInRange(&pattern, collectMatch);
 
       score->select(0, SelectType::SINGLE, 0);
-      for (Element* e : pattern.el)
-            score->select(e, SelectType::ADD, 0);
+      for (Element* ee : pattern.el)
+            score->select(ee, SelectType::ADD, 0);
       }
 
 //---------------------------------------------------------
@@ -4146,26 +4162,19 @@ void Score::cropPage(qreal margins)
 //   getProperty
 //---------------------------------------------------------
 
-QVariant Score::getProperty(Pid id) const
+QVariant Score::getProperty(Pid /*id*/) const
       {
-      switch (id) {
-            default:
-                  qDebug("Score::getProperty: unhandled id");
-                  return QVariant();
-            }
+      qDebug("Score::getProperty: unhandled id");
+      return QVariant();
       }
 
 //---------------------------------------------------------
 //   setProperty
 //---------------------------------------------------------
 
-bool Score::setProperty(Pid id, const QVariant& /*v*/)
+bool Score::setProperty(Pid /*id*/, const QVariant& /*v*/)
       {
-      switch (id) {
-            default:
-                  qDebug("Score::setProperty: unhandled id");
-                  break;
-            }
+      qDebug("Score::setProperty: unhandled id");
       setLayoutAll();
       return true;
       }
@@ -4174,12 +4183,9 @@ bool Score::setProperty(Pid id, const QVariant& /*v*/)
 //   propertyDefault
 //---------------------------------------------------------
 
-QVariant Score::propertyDefault(Pid id) const
+QVariant Score::propertyDefault(Pid /*id*/) const
       {
-      switch (id) {
-            default:
-                  return QVariant();
-            }
+      return QVariant();
       }
 
 //---------------------------------------------------------

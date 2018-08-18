@@ -1390,7 +1390,7 @@ QString MuseScore::getPluginFilename(bool open)
                   loadPluginDialog->restoreState(settings.value("loadPluginDialog").toByteArray());
                   loadPluginDialog->setAcceptMode(QFileDialog::AcceptOpen);
                   }
-            urls.append(QUrl::fromLocalFile(mscoreGlobalShare+"/styles"));
+            urls.append(QUrl::fromLocalFile(mscoreGlobalShare+"/plugins"));
             dialog = loadPluginDialog;
             }
       else {
@@ -1612,12 +1612,15 @@ void MuseScore::exportFile()
 
       QString saveDialogTitle = tr("Export");
 
-      QSettings settings;
-      if (lastSaveCopyDirectory.isEmpty())
-            lastSaveCopyDirectory = settings.value("lastSaveCopyDirectory", preferences.getString(PREF_APP_PATHS_MYSCORES)).toString();
-      if (lastSaveDirectory.isEmpty())
-            lastSaveDirectory = settings.value("lastSaveDirectory", preferences.getString(PREF_APP_PATHS_MYSCORES)).toString();
-      QString saveDirectory = lastSaveCopyDirectory;
+      QString saveDirectory;
+      if (cs->masterScore()->fileInfo()->exists())
+            saveDirectory = cs->masterScore()->fileInfo()->dir().path();
+      else {
+            QSettings settings;
+            if (lastSaveCopyDirectory.isEmpty())
+                  lastSaveCopyDirectory = settings.value("lastSaveCopyDirectory", preferences.getString(PREF_APP_PATHS_MYSCORES)).toString();
+            saveDirectory = lastSaveCopyDirectory;
+            }
 
       if (saveDirectory.isEmpty())
             saveDirectory = preferences.getString(PREF_APP_PATHS_MYSCORES);
@@ -1689,16 +1692,15 @@ bool MuseScore::exportParts()
 
       QString saveDialogTitle = tr("Export Parts");
 
-      QSettings settings;
-      if (lastSaveCopyDirectory.isEmpty())
-          lastSaveCopyDirectory = settings.value("lastSaveCopyDirectory", preferences.getString(PREF_APP_PATHS_MYSCORES)).toString();
-      if (lastSaveDirectory.isEmpty())
-          lastSaveDirectory = settings.value("lastSaveDirectory", preferences.getString(PREF_APP_PATHS_MYSCORES)).toString();
-      QString saveDirectory = lastSaveCopyDirectory;
-
-      if (saveDirectory.isEmpty()) {
-          saveDirectory = preferences.getString(PREF_APP_PATHS_MYSCORES);
-          }
+      QString saveDirectory;
+      if (cs->masterScore()->fileInfo()->exists())
+            saveDirectory = cs->masterScore()->fileInfo()->dir().path();
+      else {
+            QSettings settings;
+            if (lastSaveCopyDirectory.isEmpty())
+                lastSaveCopyDirectory = settings.value("lastSaveCopyDirectory", preferences.getString(PREF_APP_PATHS_MYSCORES)).toString();
+            saveDirectory = lastSaveCopyDirectory;
+            }
 
       if (saveDirectory.isEmpty())
             saveDirectory = preferences.getString(PREF_APP_PATHS_MYSCORES);
@@ -2262,12 +2264,22 @@ bool MuseScore::saveAs(Score* cs, bool saveCopy)
       QString saveDialogTitle = saveCopy ? tr("Save a Copy") :
                                            tr("Save As");
 
-      QSettings settings;
-      if (mscore->lastSaveCopyDirectory.isEmpty())
-            mscore->lastSaveCopyDirectory = settings.value("lastSaveCopyDirectory", preferences.getString(PREF_APP_PATHS_MYSCORES)).toString();
-      if (mscore->lastSaveDirectory.isEmpty())
-            mscore->lastSaveDirectory = settings.value("lastSaveDirectory", preferences.getString(PREF_APP_PATHS_MYSCORES)).toString();
-      QString saveDirectory = saveCopy ? mscore->lastSaveCopyDirectory : mscore->lastSaveDirectory;
+      QString saveDirectory;
+      if (cs->masterScore()->fileInfo()->exists())
+            saveDirectory = cs->masterScore()->fileInfo()->dir().path();
+      else {
+            QSettings settings;
+            if (saveCopy) {
+                  if (mscore->lastSaveCopyDirectory.isEmpty())
+                        mscore->lastSaveCopyDirectory = settings.value("lastSaveCopyDirectory", preferences.getString(PREF_APP_PATHS_MYSCORES)).toString();
+                  saveDirectory = mscore->lastSaveCopyDirectory;
+                  }
+            else {
+                  if (mscore->lastSaveDirectory.isEmpty())
+                        mscore->lastSaveDirectory = settings.value("lastSaveDirectory", preferences.getString(PREF_APP_PATHS_MYSCORES)).toString();
+                  saveDirectory = mscore->lastSaveDirectory;
+                  }
+            }
 
       if (saveDirectory.isEmpty())
             saveDirectory = preferences.getString(PREF_APP_PATHS_MYSCORES);
@@ -2321,10 +2333,15 @@ bool MuseScore::saveSelection(Score* cs)
       fl.append(tr("MuseScore File") + " (*.mscz)");
       QString saveDialogTitle = tr("Save Selection");
 
-      QSettings settings;
-      if (mscore->lastSaveDirectory.isEmpty())
-            mscore->lastSaveDirectory = settings.value("lastSaveDirectory", preferences.getString(PREF_APP_PATHS_MYSCORES)).toString();
-      QString saveDirectory = mscore->lastSaveDirectory;
+      QString saveDirectory;
+      if (cs->masterScore()->fileInfo()->exists())
+            saveDirectory = cs->masterScore()->fileInfo()->dir().path();
+      else {
+            QSettings settings;
+            if (mscore->lastSaveDirectory.isEmpty())
+                  mscore->lastSaveDirectory = settings.value("lastSaveDirectory", preferences.getString(PREF_APP_PATHS_MYSCORES)).toString();
+            saveDirectory = mscore->lastSaveDirectory;
+            }
 
       if (saveDirectory.isEmpty())
             saveDirectory = preferences.getString(PREF_APP_PATHS_MYSCORES);
@@ -2441,7 +2458,7 @@ bool MuseScore::savePng(Score* score, const QString& name)
 //    return true on success
 //---------------------------------------------------------
 
-bool MuseScore::savePng(Score* score, const QString& name, bool screenshot, bool transparent, double convDpi, int trimMargin, QImage::Format format)
+bool MuseScore::savePng(Score* score, const QString& name, bool screenshot, bool transparent, double convDpi, int _trimMargin, QImage::Format format)
       {
       bool rv = true;
       score->setPrinting(!screenshot);    // dont print page break symbols etc.
@@ -2463,8 +2480,8 @@ bool MuseScore::savePng(Score* score, const QString& name, bool screenshot, bool
             Page* page = pl.at(pageNumber);
 
             QRectF r;
-            if (trimMargin >= 0) {
-                  QMarginsF margins(trimMargin, trimMargin, trimMargin, trimMargin);
+            if (_trimMargin >= 0) {
+                  QMarginsF margins(_trimMargin, _trimMargin, _trimMargin, _trimMargin);
                   r = page->tbbox() + margins;
                   }
             else
@@ -2485,7 +2502,7 @@ bool MuseScore::savePng(Score* score, const QString& name, bool screenshot, bool
             p.setRenderHint(QPainter::Antialiasing, true);
             p.setRenderHint(QPainter::TextAntialiasing, true);
             p.scale(mag, mag);
-            if (trimMargin >= 0)
+            if (_trimMargin >= 0)
                   p.translate(-r.topLeft());
 
             QList<Element*> pel = page->elements();

@@ -1183,12 +1183,15 @@ void Note::write(XmlWriter& xml) const
       if (_accidental)
             _accidental->write(xml);
       _el.write(xml);
-      for (NoteDot* dot : _dots) {
+      bool write_dots = false;
+      for (NoteDot* dot : _dots)
             if (!dot->userOff().isNull() || !dot->visible() || dot->color() != Qt::black || dot->visible() != visible()) {
-                  dot->write(xml);
+                  write_dots = true;
                   break;
                   }
-            }
+      if (write_dots)
+            for (NoteDot* dot : _dots)
+                  dot->write(xml);
       if (_tieFor)
             _tieFor->write(xml);
       if (_tieBack) {
@@ -2141,7 +2144,7 @@ void Note::updateAccidental(AccidentalState* as)
                   return;
                   }
             if ((accVal != relLineAccVal) || hidden() || as->tieContext(relLine)) {
-                  as->setAccidentalVal(relLine, accVal, _tieBack != 0);
+                  as->setAccidentalVal(relLine, accVal, _tieBack != 0 && _accidental == 0);
                   acci = Accidental::value2subtype(accVal);
                   // if previous tied note has same tpc, don't show accidental
                   if (_tieBack && _tieBack->startNote()->tpc1() == tpc1())
@@ -2190,7 +2193,7 @@ void Note::updateAccidental(AccidentalState* as)
             // ultimetely, they should probably get their own state
             // for now, at least change state to natural, so subsequent notes playback as might be expected
             // this is an incompatible change, but better to break it for 2.0 than wait until later
-            as->setAccidentalVal(relLine, AccidentalVal::NATURAL, _tieBack != 0);
+            as->setAccidentalVal(relLine, AccidentalVal::NATURAL, _tieBack != 0 && _accidental == 0);
             }
 
       updateRelLine(relLine, true);
