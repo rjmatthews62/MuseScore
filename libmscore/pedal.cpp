@@ -110,8 +110,6 @@ Pedal::Pedal(Score* s)
 
 void Pedal::read(XmlReader& e)
       {
-      int id = e.intAttribute("id", -1);
-      e.addSpanner(id, this);
       while (e.readNextStartElement()) {
             if (!TextLineBase::readProperties(e))
                   e.unknown();
@@ -126,8 +124,7 @@ void Pedal::write(XmlWriter& xml) const
       {
       if (!xml.canWrite(this))
             return;
-      int id = xml.spannerId(this);
-      xml.stag(QString("%1 id=\"%2\"").arg(name()).arg(id));
+      xml.stag(name());
 
       for (auto i : {
          Pid::END_HOOK_TYPE,
@@ -212,12 +209,14 @@ QPointF Pedal::linePos(Grip grip, System** sys) const
       System* s = nullptr;
       if (grip == Grip::START) {
             ChordRest* c = toChordRest(startElement());
-            s = c->segment()->system();
-            x = c->pos().x() + c->segment()->pos().x() + c->segment()->measure()->pos().x();
-            if (c->type() == ElementType::REST && c->durationType() == TDuration::DurationType::V_MEASURE)
-                  x -= c->x();
-            if (beginHookType() == HookType::HOOK_45)
-                  x += nhw * .5;
+            if (c) {
+                  s = c->segment()->system();
+                  x = c->pos().x() + c->segment()->pos().x() + c->segment()->measure()->pos().x();
+                  if (c->type() == ElementType::REST && c->durationType() == TDuration::DurationType::V_MEASURE)
+                        x -= c->x();
+                  if (beginHookType() == HookType::HOOK_45)
+                        x += nhw * .5;
+                  }
             }
       else {
             Element* e = endElement();

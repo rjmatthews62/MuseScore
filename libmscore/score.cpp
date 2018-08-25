@@ -295,6 +295,7 @@ Score::Score(MasterScore* parent)
             style().set(Sid::dividerRight, false);
             }
       _synthesizerState = parent->_synthesizerState;
+      _mscVersion = parent->_mscVersion;
       }
 
 Score::Score(MasterScore* parent, const MStyle& s)
@@ -1132,8 +1133,8 @@ bool Score::getPosition(Position* pos, const QPointF& p, int voice) const
 
 bool Score::checkHasMeasures() const
       {
-      Page* page = pages().front();
-      const QList<System*>* sl = &page->systems();
+      Page* page = pages().isEmpty() ? 0 : pages().front();
+      const QList<System*>* sl = page ? &page->systems() : 0;
       if (sl == 0 || sl->empty() || sl->front()->measures().empty()) {
             qDebug("first create measure, then repeat operation");
             return false;

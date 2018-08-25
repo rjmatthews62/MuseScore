@@ -418,7 +418,7 @@ add_executable ( ${ExecutableName}
       )
 
 if (MSVC)
-	target_link_libraries(mscore vorbisfile1)
+	target_link_libraries(mscore vorbisfiledll)
 else (MSVC)
 	target_link_libraries(mscore vorbisfile)
 endif (MSVC)
@@ -468,7 +468,7 @@ if (AEOLUS)
 endif (AEOLUS)
 if (SOUNDFONT3)
       if (MSVC)
-         target_link_libraries(mscore ${VORBISFILE_LIBRARY}  ogg1)
+          target_link_libraries(mscore vorbisdll oggdll)
       else (MSVC)
           target_link_libraries(mscore ${VORBIS_LIB} ${OGG_LIB})
       endif (MSVC)
@@ -476,7 +476,7 @@ endif (SOUNDFONT3)
 
 if (HAS_AUDIOFILE)
       if (MSVC)
-         target_link_libraries(mscore audiofile ${SNDFILE_LIBRARY})
+         target_link_libraries(mscore audiofile sndfiledll)
       else (MSVC)
          target_link_libraries(mscore audiofile ${SNDFILE_LIB})
       endif (MSVC)
@@ -616,7 +616,7 @@ else (MINGW)
 
    if ( NOT MSVC )
 ## install qwebengine core
-      if (NOT APPLE)
+      if (NOT APPLE AND USE_WEBENGINE)
          install(FILES
             ${QT_INSTALL_PREFIX}/libexec/QtWebEngineProcess
             DESTINATION bin
@@ -629,7 +629,7 @@ else (MINGW)
             ${QT_INSTALL_PREFIX}/translations/qtwebengine_locales
             DESTINATION lib/qt5/translations
             )
-      endif(NOT APPLE)
+      endif(NOT APPLE AND USE_WEBENGINE)
 
       target_link_libraries(mscore
          ${ALSA_LIB}
@@ -779,7 +779,7 @@ else (MINGW)
 
       include(FindStaticLibrary)
       target_link_libraries(mscore
-         portaudio1
+         portaudiodll
          portmidi
          winmm
          mscore_freetype
@@ -803,20 +803,24 @@ else (MINGW)
                   "${QT_INSTALL_PREFIX}/bin/Qt5Qml.dll"  "${QT_INSTALL_PREFIX}/bin/Qt5Quick.dll"  "${QT_INSTALL_PREFIX}/bin/Qt5Sql.dll"
                   "${QT_INSTALL_PREFIX}/bin/Qt5Svg.dll"  "${QT_INSTALL_PREFIX}/bin/Qt5Widgets.dll"  "${QT_INSTALL_PREFIX}/bin/Qt5Xml.dll"
                   "${QT_INSTALL_PREFIX}/bin/Qt5XmlPatterns.dll"
-                  "${QT_INSTALL_PREFIX}/bin/Qt5WebEngineWidgets.dll" "${QT_INSTALL_PREFIX}/bin/Qt5WebEngineCore.dll" "${QT_INSTALL_PREFIX}/bin/Qt5WebChannel.dll"
+                  "${QT_INSTALL_PREFIX}/bin/Qt5WebChannel.dll"
                   "${QT_INSTALL_PREFIX}/bin/Qt5QuickWidgets.dll" "${QT_INSTALL_PREFIX}/bin/Qt5Positioning.dll"
                   )
+      if (USE_WEBENGINE)
+         list(APPEND dlls_to_copy "${QT_INSTALL_PREFIX}/bin/Qt5WebEngineWidgets.dll" "${QT_INSTALL_PREFIX}/bin/Qt5WebEngineCore.dll")
+      endif(USE_WEBENGINE)
+
       set(CMAKE_FIND_LIBRARY_PREFIX "")
       set(CMAKE_FIND_LIBRARY_SUFFIXES ".dll")
-      find_library( dll_lame        NAMES "lame_enc.dll"       PATHS ${PROJECT_SOURCE_DIR}/dependencies/libx86 NO_DEFAULT_PATH)
-      find_library( dll_ogg         NAMES "libogg.dll"         PATHS ${PROJECT_SOURCE_DIR}/dependencies/libx86 NO_DEFAULT_PATH)
-      find_library( dll_sndfile     NAMES "libsndfile-1.dll"   PATHS ${PROJECT_SOURCE_DIR}/dependencies/libx86 NO_DEFAULT_PATH)
-      find_library( dll_vorbis      NAMES "libvorbis.dll"        PATHS ${PROJECT_SOURCE_DIR}/dependencies/libx86 NO_DEFAULT_PATH)
-      find_library( dll_vorbisfile  NAMES "libvorbisfile.dll"    PATHS ${PROJECT_SOURCE_DIR}/dependencies/libx86 NO_DEFAULT_PATH)
-      find_library( dll_portaudio   NAMES "portaudio.dll"      PATHS ${PROJECT_SOURCE_DIR}/dependencies/libx86 NO_DEFAULT_PATH)
+      find_library( dll_lame        NAMES "lame_enc"       PATHS ${DEPENDENCIES_DIR} NO_DEFAULT_PATH)
+      find_library( dll_ogg         NAMES "libogg"         PATHS ${DEPENDENCIES_DIR} NO_DEFAULT_PATH)
+      find_library( dll_sndfile     NAMES "libsndfile-1"   PATHS ${DEPENDENCIES_DIR} NO_DEFAULT_PATH)
+      find_library( dll_vorbis      NAMES "libvorbis"      PATHS ${DEPENDENCIES_DIR} NO_DEFAULT_PATH)
+      find_library( dll_vorbisfile  NAMES "libvorbisfile"  PATHS ${DEPENDENCIES_DIR} NO_DEFAULT_PATH)
+      find_library( dll_portaudio   NAMES "portaudio"      PATHS ${DEPENDENCIES_DIR} NO_DEFAULT_PATH)
 
       list(APPEND dlls_to_copy ${dll_lame} ${dll_ogg} ${dll_sndfile} ${dll_vorbis} ${dll_vorbisfile} ${dll_portaudio} "$<TARGET_FILE_DIR:mscore>/${MUSESCORE_NAME}.exe")
-      set( output_dir_for_dlls "${PROJECT_BINARY_DIR}/../msvc.install/bin")
+      set( output_dir_for_dlls "${PROJECT_BINARY_DIR}/../msvc.install${ARCH_TYPE}/bin")
 
       COPY_FILES_INTO_DIRECTORY_IF_CHANGED( "${dlls_to_copy}" ${output_dir_for_dlls}  mscore)
 
@@ -879,33 +883,34 @@ else (MINGW)
          ${QT_INSTALL_PREFIX}/plugins/sqldrivers/qsqlite.dll
          DESTINATION bin/sqldrivers)
 
-	  install( TARGETS mscore RUNTIME DESTINATION bin ) # this duplicate due to the correctly package step
+      install( TARGETS mscore RUNTIME DESTINATION bin ) # this duplicate due to the correctly package step
 
-      install(FILES
-         ${QT_INSTALL_PREFIX}/bin/QtWebEngineProcess.exe
-	     DESTINATION bin
-         )
-      install(DIRECTORY
-         ${QT_INSTALL_PREFIX}/resources
-         DESTINATION bin/webengineresources
-		 )
-
-      install(DIRECTORY
-         ${QT_INSTALL_PREFIX}/translations/qtwebengine_locales
-         DESTINATION bin/webengineresources/translations
-		 )
-
+      if (USE_WEBENGINE)
+         install(FILES
+            ${QT_INSTALL_PREFIX}/bin/QtWebEngineProcess.exe
+            DESTINATION bin
+            )
+         install(DIRECTORY
+            ${QT_INSTALL_PREFIX}/resources
+            DESTINATION bin/webengineresources
+            )
+         install(DIRECTORY
+            ${QT_INSTALL_PREFIX}/translations/qtwebengine_locales
+            DESTINATION bin/webengineresources/translations
+            )
+      endif (USE_WEBENGINE)
+      
       install(DIRECTORY
          ${QT_INSTALL_PREFIX}/qml
          DESTINATION .
          REGEX ".*d\\.dll" EXCLUDE
-		 REGEX ".pdb" EXCLUDE
+         REGEX ".pdb" EXCLUDE
          REGEX ".*QtGraphicalEffects.*" EXCLUDE
          REGEX ".*QtMultimedia.*" EXCLUDE
          REGEX ".*QtSensors.*" EXCLUDE
          REGEX ".*QtTest.*" EXCLUDE
-		 REGEX ".*QtWebkit.*" EXCLUDE
-		 )
+         REGEX ".*QtWebkit.*" EXCLUDE
+         )
 
 
    endif ( NOT MSVC )
